@@ -1,0 +1,83 @@
+@model AbsSilkSaris.ViewModels.ShopViewModel
+<nav class="container-xl breadcrumb" aria-label="breadcrumb">
+    <a asp-controller="Home" asp-action="Index">Home</a> / Collection
+</nav>
+<section class="section pt-4">
+    <div class="container-xl">
+        <div class="section-head text-start">
+            <p class="eyebrow" style="color:var(--gold)">The atelier</p>
+            <h2>@(string.IsNullOrWhiteSpace(Model.CategorySlug) ? "Shop Collection" : Model.Products.FirstOrDefault()?.Category?.Name ?? "Collection")</h2>
+            <p class="text-muted">@Model.TotalCount handloom silks · filter by colour, weave and price</p>
+        </div>
+        <form method="get" class="filters mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label>Category</label>
+                    <select name="category" class="form-select" onchange="this.form.submit()">
+                        <option value="">All collections</option>
+                        @foreach (var c in Model.Categories)
+                        {
+                            if (Model.CategorySlug == c.Slug)
+                            {
+                                <option value="@c.Slug" selected>@c.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@c.Slug">@c.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>Colour</label>
+                    <select name="color" class="form-select" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @foreach (var color in Model.Colors)
+                        {
+                            if (Model.Color == color)
+                            {
+                                <option value="@color" selected>@color</option>
+                            }
+                            else
+                            {
+                                <option value="@color">@color</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>Min ₹</label>
+                    <input type="number" name="min" value="@Model.MinPrice" />
+                </div>
+                <div class="col-md-2">
+                    <label>Max ₹</label>
+                    <input type="number" name="max" value="@Model.MaxPrice" />
+                </div>
+                <div class="col-md-2">
+                    <label>Sort</label>
+                    <select name="sort" class="form-select" onchange="this.form.submit()">
+                        <option value="featured">Featured</option>
+                        <option value="newest">Newest</option>
+                        <option value="price-asc">Price: low to high</option>
+                        <option value="price-desc">Price: high to low</option>
+                    </select>
+                    <script>document.currentScript.previousElementSibling.value = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Sort));</script>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn-gold w-100" type="submit">Go</button>
+                </div>
+            </div>
+            <input type="hidden" name="q" value="@Model.Query" />
+        </form>
+        <div class="product-grid">
+            @foreach (var p in Model.Products)
+            {
+                <partial name="_ProductCard" model="p" />
+            }
+        </div>
+        @if (!Model.Products.Any())
+        {
+            <p class="text-center mt-5">No silks match those filters. Explore the full collection instead.</p>
+        }
+    </div>
+</section>

@@ -1,0 +1,10 @@
+@model AbsSilkSaris.Models.Order
+<section class="section">
+    <div class="container-xl text-center" style="max-width:640px">
+        <p class="eyebrow" style="color:var(--gold)">Thank you</p>
+        <h1 class="serif" style="color:var(--maroon)">Order @Model.OrderNumber confirmed</h1>
+        <p>A silk is on its way into our packing atelier. Track anytime with your order number and email.</p>
+        <p class="fs-4">₹@Model.Total.ToString("N0") · @Model.Status</p>
+        <a class="btn-gold" asp-controller="Order" asp-action="Track">Track this order</a>
+    </div>
+</section>

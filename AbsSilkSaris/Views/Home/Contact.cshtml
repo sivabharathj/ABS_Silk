@@ -1,0 +1,27 @@
+<section class="page-hero"><div class="container-xl"><h1>Contact</h1><p>Store, concierge and appointments</p></section>
+<section class="section">
+    <div class="container-xl">
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <h2 class="serif" style="color:var(--maroon)">Store location</h2>
+                <p>14, Silk Weavers Street<br />Kanchipuram, Tamil Nadu 631501<br />India</p>
+                <p>Showroom hours: 10:30 – 20:30, all days</p>
+                <p>Atelier: <a href="tel:+914448621100">+91 44 4862 1100</a><br />
+                <a href="mailto:atelier@abssilksaris.com">atelier@abssilksaris.com</a></p>
+                <iframe title="Store map" loading="lazy" style="width:100%;min-height:280px;border:0;border-radius:16px" src="https://maps.google.com/maps?q=Kanchipuram%20silk&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+            </div>
+            <div class="col-lg-6">
+                <form asp-action="Contact" method="post" class="form-luxury">
+                    @Html.AntiForgeryToken()
+                    <label>Name</label>
+                    <input class="form-control mb-3" name="name" required />
+                    <label>Email</label>
+                    <input class="form-control mb-3" type="email" name="email" required />
+                    <label>Message</label>
+                    <textarea class="form-control mb-3" name="message" rows="5" required></textarea>
+                    <button class="btn-gold" type="submit">Send to concierge</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

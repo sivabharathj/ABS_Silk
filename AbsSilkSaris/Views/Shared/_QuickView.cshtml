@@ -1,0 +1,15 @@
+@model AbsSilkSaris.Models.Product
+<div class="row g-0">
+    <div class="col-md-6">
+        <img src="@Model.ImageUrl" alt="@Model.Name" class="w-100" style="object-fit:cover;min-height:420px;" />
+    </div>
+    <div class="col-md-6 p-4">
+        <button type="button" class="btn-close float-end" data-bs-dismiss="modal" aria-label="Close"></button>
+        <p class="sku">@Model.Sku · @Model.Weave</p>
+        <h3 class="serif">@Model.Name</h3>
+        <p class="price fs-4">₹@Model.Price.ToString("N0")</p>
+        <p>@Model.Description</p>
+        <button class="add-full" type="button" data-add-cart="@Model.Id" data-bs-dismiss="modal">Add to cart</button>
+        <a class="btn-outline-maroon mt-3" asp-controller="Shop" asp-action="Details" asp-route-slug="@Model.Slug">View full details</a>
+    </div>
+</div>

@@ -1,0 +1,188 @@
+﻿@model AbsSilkSaris.ViewModels.HomeViewModel
+@{
+    ViewData["MetaDescription"] = "Authentic Kanchipuram silk sarees for every celebration. Bridal, wedding, pure zari and soft silks from ABS Silk Saris.";
+}
+
+<section class="hero" aria-label="Brand banner">
+    <div class="hero-slide active" style="background-image:url('/images/hero/hero-kanchipuram-saree.png')"></div>
+    <div class="hero-slide" style="background-image:url('/images/hero/hero-ivory-palace.png')"></div>
+    <div class="hero-overlay"></div>
+    <div class="container-xl hero-content">
+        <div>
+            <p class="eyebrow">ABS Silk Saris · Kanchipuram</p>
+            <h1>Timeless Elegance in Every Weave</h1>
+            <p class="lead">Authentic Kanchipuram Silk Sarees for Every Celebration</p>
+            <div class="d-flex flex-wrap gap-3 mt-4">
+                <a class="btn-gold" asp-controller="Shop" asp-action="Index">Shop Collection</a>
+                <a class="btn-ghost" asp-controller="Shop" asp-action="Index" asp-route-sort="newest">Explore New Arrivals</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="categories">
+    <div class="container-xl">
+        <div class="section-head">
+            <div class="gold-rule"></div>
+            <p class="eyebrow" style="color:var(--gold)">Explore the weaves</p>
+            <h2>Featured Categories</h2>
+            <p class="text-muted">Bridal silks, wedding heirlooms, pure zari and lighter drapes — curated as a leading Kanchipuram house would.</p>
+        </div>
+        <div class="cat-grid">
+            @foreach (var c in Model.Categories)
+            {
+                <a class="cat-card" asp-controller="Shop" asp-action="Index" asp-route-category="@c.Slug">
+                    <img src="@c.ImageUrl" alt="@c.Name" loading="lazy" width="640" height="800" />
+                    <div class="shade"></div>
+                    <div class="copy">
+                        <span>Collection</span>
+                        <h3>@c.Name</h3>
+                        <p class="mb-0 small">@c.Description</p>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0" id="new-arrivals">
+    <div class="container-xl">
+        <div class="section-head">
+            <div class="gold-rule"></div>
+            <p class="eyebrow" style="color:var(--gold)">From the loom this season</p>
+            <h2>New Arrivals</h2>
+        </div>
+        <div class="product-grid">
+            @foreach (var p in Model.NewArrivals)
+            {
+                <partial name="_ProductCard" model="p" />
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0" id="best-sellers">
+    <div class="container-xl">
+        <div class="section-head">
+            <div class="gold-rule"></div>
+            <p class="eyebrow" style="color:var(--gold)">Customer favourites</p>
+            <h2>Best Sellers</h2>
+        </div>
+        <div class="carousel-wrap">
+            <button class="carousel-nav prev d-none d-md-grid" type="button" data-carousel="prev" aria-label="Previous"><i class="bi bi-chevron-left"></i></button>
+            <div class="best-track" id="best-track">
+                @foreach (var p in Model.BestSellers)
+                {
+                    <partial name="_ProductCard" model="p" />
+                }
+            </div>
+            <button class="carousel-nav next d-none d-md-grid" type="button" data-carousel="next" aria-label="Next"><i class="bi bi-chevron-right"></i></button>
+        </div>
+    </div>
+</section>
+
+<section class="heritage" id="heritage" style="background-image:url('/images/heritage/heritage-weaving.png')">
+    <div class="veil">
+        <div class="container-xl heritage-inner">
+            <p class="eyebrow">The story of ABS Silk Saris</p>
+            <h2 class="display-4 serif">Woven in Kanchipuram, worn for generations</h2>
+            <p>We design and weave with master artisans in the temple city — mulberry silk, authentic zari, and korvai borders locked by hand. Like the great silk houses of Tamil Nadu, our work is a conversation between loom and occasion: muhurtham, reception, festival, and the quiet luxury of everyday silk.</p>
+            <a class="btn-gold mt-3" asp-controller="Home" asp-action="About">Read our heritage</a>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="why">
+    <div class="container-xl">
+        <div class="section-head">
+            <div class="gold-rule"></div>
+            <h2>Why Choose ABS Silk Saris</h2>
+        </div>
+        <div class="why-grid">
+            <div class="why-card"><i class="bi bi-gem"></i><h3>100% Authentic Silk</h3><p>Pure mulberry silk and tested zari, sourced and woven in Kanchipuram.</p></div>
+            <div class="why-card"><i class="bi bi-shield-lock"></i><h3>Secure Payments</h3><p>SSL checkout with trusted gateways. Your atelier orders stay confidential.</p></div>
+            <div class="why-card"><i class="bi bi-globe2"></i><h3>Worldwide Shipping</h3><p>From Kanchipuram to your doorstep — insured, tracked, gift-ready.</p></div>
+            <div class="why-card"><i class="bi bi-arrow-repeat"></i><h3>Easy Returns</h3><p>Seven-day atelier returns on unused silks with original tags.</p></div>
+            <div class="why-card"><i class="bi bi-award"></i><h3>Trusted Quality</h3><p>Each saree is inspected for weave density, colour, and zari finish.</p></div>
+            <div class="why-card"><i class="bi bi-headset"></i><h3>Premium Customer Support</h3><p>WhatsApp concierge for drape advice, blouse matching, and gifting.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0" id="video">
+    <div class="container-xl">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-7">
+                <div class="video-frame" style="background-image:url('/images/heritage/heritage-weaving.png')">
+                    <iframe src="https://www.youtube.com/embed/agruu0qNn9E?rel=0" title="Silk weaving process" loading="lazy" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <p class="eyebrow" style="color:var(--gold)">The loom, on film</p>
+                <h2 class="serif" style="color:var(--maroon);font-size:2.6rem;">The silk weaving process</h2>
+                <p>Watch korvai interlocking, zari throwing and temple borders take shape on the pit loom — the same craft behind every ABS Kanchipuram.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0" id="reviews">
+    <div class="container-xl">
+        <div class="section-head">
+            <div class="gold-rule"></div>
+            <h2>Customer Reviews</h2>
+        </div>
+        <div class="review-grid">
+            @foreach (var r in Model.Reviews)
+            {
+                <article class="review-card">
+                    <div class="d-flex gap-3 align-items-center mb-3">
+                        <img src="@r.PhotoUrl" alt="@r.CustomerName" width="64" height="64" loading="lazy" />
+                        <div>
+                            <strong>@r.CustomerName</strong>
+                            <div class="small text-muted">@r.Location</div>
+                            <div class="stars">@string.Concat(Enumerable.Repeat("★", r.Stars))</div>
+                        </div>
+                    </div>
+                    <h3 class="h5 serif">@r.Title</h3>
+                    <p class="mb-0">@r.Body</p>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0" id="instagram">
+    <div class="container-xl">
+        <div class="section-head">
+            <div class="gold-rule"></div>
+            <p class="eyebrow" style="color:var(--gold)">@Html.Raw("@abssilksaris")</p>
+            <h2>Instagram Gallery</h2>
+        </div>
+        <div class="insta-grid">
+            @for (var i = 1; i <= 6; i++)
+            {
+                <a href="https://www.instagram.com/" target="_blank" rel="noopener">
+                    <img src="/images/instagram/insta-@(i).png" alt="ABS Silk Saris Instagram look @i" loading="lazy" width="400" height="400" />
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="section pt-0" id="newsletter">
+    <div class="container-xl">
+        <div class="newsletter">
+            <div>
+                <p class="eyebrow">ABS Threads</p>
+                <h2>Love silks? Stay with the weave.</h2>
+                <p class="mb-0">Private previews, bridal appointments and new-loom letters — never noise.</p>
+            </div>
+            <form asp-controller="Home" asp-action="Newsletter" method="post">
+                @Html.AntiForgeryToken()
+                <input type="email" name="email" required placeholder="Your email" aria-label="Email" />
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</section>
