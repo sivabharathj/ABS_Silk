@@ -20,8 +20,12 @@ public class Product
     public string? HoverImageUrl { get; set; }
     public int CategoryId { get; set; }
     public Category? Category { get; set; }
+    public int? SubCategoryId { get; set; }
+    public SubCategory? SubCategory { get; set; }
     public bool IsNew { get; set; }
     public bool IsBestSeller { get; set; }
+    public bool IsActive { get; set; } = true;
+    public List<ProductImage> Images { get; set; } = new();
     public int Stock { get; set; } = 8;
     public double Rating { get; set; } = 4.8;
     public int ReviewCount { get; set; } = 12;

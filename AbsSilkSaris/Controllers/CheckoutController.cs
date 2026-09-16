@@ -8,14 +8,9 @@ namespace AbsSilkSaris.Controllers;
 
 public class CheckoutController : Controller
 {
-    private readonly ApplicationDbContext _db;
+    private readonly CatalogRepository _db;
     private readonly SessionCartService _cart;
-
-    public CheckoutController(ApplicationDbContext db, SessionCartService cart)
-    {
-        _db = db;
-        _cart = cart;
-    }
+    public CheckoutController(CatalogRepository db, SessionCartService cart) { _db = db; _cart = cart; }
 
     public IActionResult Index()
     {
@@ -24,17 +19,10 @@ public class CheckoutController : Controller
         var sub = lines.Sum(l => l.Price * l.Quantity);
         var ship = sub >= 15000 ? 0 : 350;
         ViewData["Title"] = "Secure Checkout";
-        return View(new CheckoutViewModel
-        {
-            Lines = lines,
-            Subtotal = sub,
-            Shipping = ship,
-            Total = sub + ship
-        });
+        return View(new CheckoutViewModel { Lines = lines, Subtotal = sub, Shipping = ship, Total = sub + ship });
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Place(CheckoutViewModel model)
     {
         var lines = _cart.GetCart();
@@ -44,7 +32,6 @@ public class CheckoutController : Controller
             TempData["Notice"] = "Please share your name and email so we can confirm the order.";
             return RedirectToAction(nameof(Index));
         }
-
         var sub = lines.Sum(l => l.Price * l.Quantity);
         var ship = sub >= 15000 ? 0 : 350;
         var order = new Order
@@ -61,23 +48,16 @@ public class CheckoutController : Controller
             Subtotal = sub,
             Shipping = ship,
             Total = sub + ship,
-            Items = lines.Select(l => new OrderItem
-            {
-                ProductId = l.ProductId,
-                ProductName = l.Name,
-                Quantity = l.Quantity,
-                UnitPrice = l.Price
-            }).ToList()
+            Items = lines.Select(l => new OrderItem { ProductId = l.ProductId, ProductName = l.Name, Quantity = l.Quantity, UnitPrice = l.Price }).ToList()
         };
-        _db.Orders.Add(order);
-        await _db.SaveChangesAsync();
+        await _db.InsertOrderAsync(order);
         _cart.ClearCart();
         return RedirectToAction(nameof(Success), new { id = order.OrderNumber });
     }
 
-    public IActionResult Success(string id)
+    public async Task<IActionResult> Success(string id)
     {
-        var order = _db.Orders.FirstOrDefault(o => o.OrderNumber == id);
+        var order = await _db.GetOrderByNumberAsync(id);
         if (order is null) return RedirectToAction("Index", "Home");
         ViewData["Title"] = "Order confirmed";
         return View(order);

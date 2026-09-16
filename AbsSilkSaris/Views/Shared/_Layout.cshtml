@@ -1,10 +1,12 @@
 ﻿@inject AbsSilkSaris.Services.SessionCartService Cart
-@inject Microsoft.Extensions.Configuration.IConfiguration Config
+@inject AbsSilkSaris.Data.CatalogRepository Catalog
 @{
-    var store = Config["Store:Name"] ?? "ABS Silk Saris";
-    var wa = Config["Store:WhatsApp"] ?? "919876543210";
-    var phone = Config["Store:Phone"] ?? "";
-    var email = Config["Store:Email"] ?? "";
+    var settings = await Catalog.GetSettingsAsync();
+    var store = settings.GetValueOrDefault("StoreName", "ABS Silk Saris");
+    var wa = settings.GetValueOrDefault("WhatsApp", "919876543210");
+    var phone = settings.GetValueOrDefault("Phone", "");
+    var email = settings.GetValueOrDefault("Email", "");
+    var announcement = settings.GetValueOrDefault("Announcement", "Complimentary shipping on silks above ₹15,000 · Authenticated zari · Worldwide delivery");
     var title = ViewData["Title"] as string;
     var pageTitle = string.IsNullOrWhiteSpace(title) ? store : $"{title} | {store}";
     var desc = ViewData["MetaDescription"] as string ?? "Authentic Kanchipuram silk sarees for every celebration. Bridal, wedding, pure zari and soft silks woven in Kanchipuram.";
@@ -53,7 +55,7 @@
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="announcement">
         <div class="container-xl d-flex justify-content-between align-items-center gap-3">
-            <span>Complimentary shipping on silks above ₹15,000 · Authenticated zari · Worldwide delivery</span>
+            <span>@announcement</span>
             <span class="d-none d-md-inline">Concierge @phone</span>
         </div>
     </div>
@@ -87,55 +89,7 @@
                 </div>
             </div>
         </div>
-        <nav class="mega-nav d-none d-lg-block" aria-label="Primary">
-            <div class="container-xl">
-                <ul class="mega-list">
-                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li class="has-mega">
-                        <a asp-controller="Shop" asp-action="Index">Collections <i class="bi bi-chevron-down"></i></a>
-                        <div class="mega-panel">
-                            <div class="container-xl mega-grid">
-                                <div>
-                                    <p class="mega-label">Featured categories</p>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-category="bridal-silk-sarees">Bridal Silk Sarees</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-category="wedding-collection">Wedding Collection</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-category="pure-zari-sarees">Pure Zari Sarees</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-category="traditional-kanchipuram-sarees">Traditional Kanchipuram</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-category="soft-silk-sarees">Soft Silk Sarees</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-category="party-wear-silk-sarees">Party Wear Silk</a>
-                                </div>
-                                <div>
-                                    <p class="mega-label">Weaves of Kanjivaram</p>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Temple">Temple Border</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Checks">Kattam Checks</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Korvai">Korvai Contrast</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Ganga">Ganga Jamuna</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Butta">Borderless Butta</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Zari">Pure Zari</a>
-                                </div>
-                                <div>
-                                    <p class="mega-label">Occasions</p>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Bridal">Muhurtham</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Wedding">Wedding rituals</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Festival">Festive days</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Party">Reception &amp; sangeet</a>
-                                    <a asp-controller="Shop" asp-action="Index" asp-route-q="Everyday">Everyday classics</a>
-                                </div>
-                                <a class="mega-feature" asp-controller="Shop" asp-action="Index" asp-route-category="bridal-silk-sarees">
-                                    <img src="~/images/categories/category-bridal.png" alt="Bridal collection" width="280" height="360" />
-                                    <span>Bridal atelier · Shop now</span>
-                                </a>
-                            </div>
-                        </div>
-                    </li>
-                    <li><a asp-controller="Shop" asp-action="Index" asp-route-sort="newest">New Arrivals</a></li>
-                    <li><a asp-controller="Shop" asp-action="Index" asp-route-category="bridal-silk-sarees">Bridal</a></li>
-                    <li><a asp-controller="Home" asp-action="About">Heritage</a></li>
-                    <li><a asp-controller="Order" asp-action="Track">Track Order</a></li>
-                    <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
-                </ul>
-            </div>
-        </nav>
+        @await Component.InvokeAsync("StoreMenu")
     </header>
 
     <div class="offcanvas offcanvas-start mobile-drawer" tabindex="-1" id="mobileNav">
@@ -144,20 +98,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <form asp-controller="Shop" asp-action="Index" method="get" class="mobile-search mb-4">
-                <input type="search" name="q" placeholder="Search sarees" />
-                <button type="submit"><i class="bi bi-search"></i></button>
-            </form>
-            <a asp-controller="Shop" asp-action="Index">Shop Collection</a>
-            <a asp-controller="Shop" asp-action="Index" asp-route-category="bridal-silk-sarees">Bridal Silk</a>
-            <a asp-controller="Shop" asp-action="Index" asp-route-category="wedding-collection">Wedding</a>
-            <a asp-controller="Shop" asp-action="Index" asp-route-category="pure-zari-sarees">Pure Zari</a>
-            <a asp-controller="Shop" asp-action="Index" asp-route-category="traditional-kanchipuram-sarees">Traditional</a>
-            <a asp-controller="Shop" asp-action="Index" asp-route-category="soft-silk-sarees">Soft Silk</a>
-            <a asp-controller="Shop" asp-action="Index" asp-route-category="party-wear-silk-sarees">Party Wear</a>
-            <a asp-controller="Home" asp-action="About">Heritage</a>
-            <a asp-controller="Order" asp-action="Track">Track Order</a>
-            <a asp-area="Identity" asp-page="/Account/Login">Login / Register</a>
+            @await Component.InvokeAsync("StoreMenu", new { view = "Mobile" })
         </div>
     </div>
 
@@ -190,6 +131,7 @@
                     <a asp-controller="Shop" asp-action="Index">Shop Collection</a>
                     <a asp-controller="Home" asp-action="Contact">Contact</a>
                     <a asp-controller="Order" asp-action="Track">Order Tracking</a>
+                    <a asp-area="Admin" asp-controller="Account" asp-action="Login">Admin login</a>
                 </div>
                 <div class="col-6 col-lg-3">
                     <h6>Policies</h6>
@@ -200,11 +142,11 @@
                 </div>
                 <div class="col-lg-3">
                     <h6>Visit &amp; write</h6>
-                    <p>@Config["Store:Address"]</p>
+                    <p>@settings.GetValueOrDefault("Address", "14, Silk Weavers Street, Kanchipuram, Tamil Nadu 631501")</p>
                     <p><a href="tel:@phone">@phone</a><br /><a href="mailto:@email">@email</a></p>
                     <div class="socials">
-                        <a href="@Config["Store:Instagram"]" aria-label="Instagram" target="_blank" rel="noopener"><i class="bi bi-instagram"></i></a>
-                        <a href="@Config["Store:Facebook"]" aria-label="Facebook" target="_blank" rel="noopener"><i class="bi bi-facebook"></i></a>
+                        <a href="@settings.GetValueOrDefault("Instagram", "https://www.instagram.com/")" aria-label="Instagram" target="_blank" rel="noopener"><i class="bi bi-instagram"></i></a>
+                        <a href="@settings.GetValueOrDefault("Facebook", "https://www.facebook.com/")" aria-label="Facebook" target="_blank" rel="noopener"><i class="bi bi-facebook"></i></a>
                         <a href="https://wa.me/@wa" aria-label="WhatsApp" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i></a>
                     </div>
                 </div>

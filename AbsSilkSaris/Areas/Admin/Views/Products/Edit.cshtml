@@ -1,0 +1,47 @@
+@model Product
+@{
+    var cats = ViewBag.Categories as List<Category> ?? new();
+    var subs = ViewBag.SubCategories as List<SubCategory> ?? new();
+}
+<h1 class="serif">Edit product</h1>
+<form method="post" enctype="multipart/form-data" class="form-luxury">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ImageUrl" />
+    <partial name="_ProductFields" model="Model" />
+    <label>Replace primary image</label>
+    <input class="form-control mb-3" type="file" name="primaryImage" accept="image/*" />
+    <label>Add gallery images</label>
+    <input class="form-control mb-3" type="file" name="gallery" accept="image/*" multiple />
+    <button class="btn-gold" type="submit">Save</button>
+    <a class="btn-outline-maroon ms-2" asp-action="Index">Back</a>
+</form>
+<div class="d-flex flex-wrap gap-3 mt-4">
+    @foreach (var img in Model.Images)
+    {
+        <div>
+            <img src="@img.ImageUrl" alt="" style="height:90px;border-radius:8px" />
+            <form asp-action="DeleteImage" method="post" class="mt-1">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@img.Id" />
+                <input type="hidden" name="productId" value="@Model.Id" />
+                <button class="btn-reset small" type="submit">Remove</button>
+            </form>
+        </div>
+    }
+</div>
+@section Scripts {
+<script>
+  const subs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(subs.Select(s => new { s.Id, s.CategoryId, s.Name })));
+  const cat = document.getElementById('CategoryId');
+  const sub = document.getElementById('SubCategoryId');
+  function filterSubs() {
+    const cid = parseInt(cat.value || '0', 10);
+    const current = sub.value;
+    sub.innerHTML = '<option value="0">None</option>' + subs.filter(s => s.CategoryId === cid).map(s => `<option value="${s.Id}">${s.Name}</option>`).join('');
+    if ([...sub.options].some(o => o.value === current)) sub.value = current;
+  }
+  cat.addEventListener('change', filterSubs);
+  filterSubs();
+</script>
+}

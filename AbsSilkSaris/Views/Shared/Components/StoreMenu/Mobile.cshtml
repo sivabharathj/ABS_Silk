@@ -1,0 +1,17 @@
+@model List<AbsSilkSaris.Models.MenuCategory>
+<form asp-area="" asp-controller="Shop" asp-action="Index" method="get" class="mobile-search mb-4">
+    <input type="search" name="q" placeholder="Search sarees" />
+    <button type="submit"><i class="bi bi-search"></i></button>
+</form>
+<a asp-area="" asp-controller="Shop" asp-action="Index">Shop Collection</a>
+@foreach (var item in Model)
+{
+    <a asp-area="" asp-controller="Shop" asp-action="Index" asp-route-category="@item.Category.Slug"><strong>@item.Category.Name</strong></a>
+    foreach (var sub in item.SubCategories)
+    {
+        <a asp-area="" asp-controller="Shop" asp-action="Index" asp-route-category="@item.Category.Slug" asp-route-subcategory="@sub.Slug" class="ps-3">@sub.Name</a>
+    }
+}
+<a asp-area="" asp-controller="Home" asp-action="About">Heritage</a>
+<a asp-area="" asp-controller="Order" asp-action="Track">Track Order</a>
+<a asp-area="Admin" asp-controller="Account" asp-action="Login">Staff login</a>

@@ -1,0 +1,29 @@
+@model List<Product>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="serif mb-0">Products</h1>
+    <a class="btn-gold" asp-action="Create">Add product</a>
+</div>
+<table class="table align-middle">
+    <thead><tr><th></th><th>Name</th><th>SKU</th><th>Category</th><th>Subcategory</th><th>Price</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var p in Model)
+    {
+        <tr>
+            <td>@if (!string.IsNullOrEmpty(p.ImageUrl)) { <img src="@p.ImageUrl" alt="" style="width:44px;height:58px;object-fit:cover;border-radius:6px" /> }</td>
+            <td>@p.Name</td>
+            <td>@p.Sku</td>
+            <td>@p.Category?.Name</td>
+            <td>@p.SubCategory?.Name</td>
+            <td>₹@p.Price.ToString("N0")</td>
+            <td class="text-end">
+                <a asp-action="Edit" asp-route-id="@p.Id">Edit</a>
+                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this product?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@p.Id" />
+                    <button class="btn-reset text-danger" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

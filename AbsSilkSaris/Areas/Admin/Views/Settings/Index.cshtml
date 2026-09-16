@@ -1,0 +1,32 @@
+@model Dictionary<string, string>
+@{
+    string V(string k, string d = "") => Model.GetValueOrDefault(k, d);
+}
+<h1 class="serif">Site options</h1>
+<p class="text-muted">These values drive the homepage hero, announcement bar and contact details.</p>
+<form method="post" enctype="multipart/form-data" class="form-luxury" style="max-width:720px">
+    @Html.AntiForgeryToken()
+    <label>Hero heading</label>
+    <input class="form-control mb-3" name="HeroHeading" value="@V("HeroHeading")" />
+    <label>Hero subheading</label>
+    <input class="form-control mb-3" name="HeroSubheading" value="@V("HeroSubheading")" />
+    <label>Announcement bar</label>
+    <input class="form-control mb-3" name="Announcement" value="@V("Announcement")" />
+    <label>Phone</label>
+    <input class="form-control mb-3" name="Phone" value="@V("Phone")" />
+    <label>WhatsApp (country code + number)</label>
+    <input class="form-control mb-3" name="WhatsApp" value="@V("WhatsApp")" />
+    <label>Email</label>
+    <input class="form-control mb-3" name="Email" value="@V("Email")" />
+    <label>Address</label>
+    <input class="form-control mb-3" name="Address" value="@V("Address")" />
+    <label>Instagram URL</label>
+    <input class="form-control mb-3" name="Instagram" value="@V("Instagram", "https://www.instagram.com/")" />
+    <label>Facebook URL</label>
+    <input class="form-control mb-3" name="Facebook" value="@V("Facebook", "https://www.facebook.com/")" />
+    <label>Replace hero image 1</label>
+    <input class="form-control mb-3" type="file" name="hero1" accept="image/*" />
+    <label>Replace hero image 2</label>
+    <input class="form-control mb-3" type="file" name="hero2" accept="image/*" />
+    <button class="btn-gold" type="submit">Save options</button>
+</form>

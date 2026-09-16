@@ -15,7 +15,9 @@ public class ShopViewModel
     public List<Product> Products { get; set; } = new();
     public List<Category> Categories { get; set; } = new();
     public List<string> Colors { get; set; } = new();
+    public List<SubCategory> SubCategories { get; set; } = new();
     public string? CategorySlug { get; set; }
+    public string? SubCategorySlug { get; set; }
     public string? Color { get; set; }
     public string? Query { get; set; }
     public string Sort { get; set; } = "featured";

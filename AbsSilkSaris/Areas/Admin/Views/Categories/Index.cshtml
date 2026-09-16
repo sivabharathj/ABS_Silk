@@ -1,0 +1,30 @@
+@model List<Category>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="serif mb-0">Categories</h1>
+    <a class="btn-gold" asp-action="Create">Add category</a>
+</div>
+<p class="text-muted">Each category is a top-level menu item. Sort order controls left-to-right placement.</p>
+<table class="table align-middle">
+    <thead><tr><th></th><th>Name</th><th>Slug</th><th>Menu</th><th>Active</th><th>Order</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@if (!string.IsNullOrEmpty(c.ImageUrl)) { <img src="@c.ImageUrl" alt="" style="width:48px;height:64px;object-fit:cover;border-radius:8px" /> }</td>
+            <td>@c.Name</td>
+            <td>@c.Slug</td>
+            <td>@(c.ShowInMenu ? "Yes" : "No")</td>
+            <td>@(c.IsActive ? "Yes" : "No")</td>
+            <td>@c.SortOrder</td>
+            <td class="text-end">
+                <a asp-action="Edit" asp-route-id="@c.Id">Edit</a>
+                <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this category and its products?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@c.Id" />
+                    <button class="btn-reset text-danger" type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

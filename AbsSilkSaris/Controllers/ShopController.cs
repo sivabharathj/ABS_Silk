@@ -1,49 +1,27 @@
 using AbsSilkSaris.Data;
 using AbsSilkSaris.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AbsSilkSaris.Controllers;
 
 public class ShopController : Controller
 {
-    private readonly ApplicationDbContext _db;
+    private readonly CatalogRepository _db;
+    public ShopController(CatalogRepository db) => _db = db;
 
-    public ShopController(ApplicationDbContext db) => _db = db;
-
-    public async Task<IActionResult> Index(string? category, string? color, string? q, string sort = "featured", decimal? min = null, decimal? max = null)
+    public async Task<IActionResult> Index(string? category, string? subcategory, string? color, string? q, string sort = "featured", decimal? min = null, decimal? max = null)
     {
-        var query = _db.Products.AsNoTracking().Include(p => p.Category).AsQueryable();
-        if (!string.IsNullOrWhiteSpace(category))
-        {
-            query = query.Where(p => p.Category!.Slug == category);
-        }
-        if (!string.IsNullOrWhiteSpace(color))
-        {
-            query = query.Where(p => p.Color == color);
-        }
-        if (!string.IsNullOrWhiteSpace(q))
-        {
-            query = query.Where(p => p.Name.Contains(q) || p.Color.Contains(q) || p.Weave.Contains(q) || p.Sku.Contains(q));
-        }
-        if (min is not null) query = query.Where(p => p.Price >= min);
-        if (max is not null) query = query.Where(p => p.Price <= max);
-
-        query = sort switch
-        {
-            "price-asc" => query.OrderBy(p => p.Price),
-            "price-desc" => query.OrderByDescending(p => p.Price),
-            "newest" => query.OrderByDescending(p => p.Id),
-            _ => query.OrderByDescending(p => p.IsBestSeller).ThenByDescending(p => p.IsNew)
-        };
-
-        var products = await query.ToListAsync();
+        var products = await _db.SearchProductsAsync(category, subcategory, color, q, sort, min, max);
+        var cats = await _db.GetCategoriesAsync(activeOnly: true);
+        var selected = cats.FirstOrDefault(c => c.Slug == category);
         var model = new ShopViewModel
         {
             Products = products,
-            Categories = await _db.Categories.AsNoTracking().OrderBy(c => c.SortOrder).ToListAsync(),
-            Colors = await _db.Products.AsNoTracking().Select(p => p.Color).Distinct().OrderBy(c => c).ToListAsync(),
+            Categories = cats,
+            SubCategories = await _db.GetSubCategoriesAsync(selected?.Id, menuOnly: false),
+            Colors = await _db.GetColorsAsync(),
             CategorySlug = category,
+            SubCategorySlug = subcategory,
             Color = color,
             Query = q,
             Sort = sort,
@@ -51,24 +29,25 @@ public class ShopController : Controller
             MaxPrice = max,
             TotalCount = products.Count
         };
-        ViewData["Title"] = string.IsNullOrWhiteSpace(category) ? "Shop Collection" : products.FirstOrDefault()?.Category?.Name ?? "Collection";
+        ViewData["Title"] = selected?.Name ?? (string.IsNullOrWhiteSpace(subcategory) ? "Shop Collection" : products.FirstOrDefault()?.SubCategory?.Name ?? "Collection");
         return View(model);
     }
 
     public async Task<IActionResult> Details(string slug)
     {
-        var product = await _db.Products.AsNoTracking().Include(p => p.Category).FirstOrDefaultAsync(p => p.Slug == slug);
+        var product = await _db.GetProductBySlugAsync(slug);
         if (product is null) return NotFound();
-        ViewBag.Related = await _db.Products.AsNoTracking().Include(p => p.Category)
-            .Where(p => p.CategoryId == product.CategoryId && p.Id != product.Id)
-            .Take(4).ToListAsync();
+        product.Images = await _db.GetProductImagesAsync(product.Id);
+        var related = (await _db.SearchProductsAsync(product.Category?.Slug, null, null, null, "featured", null, null))
+            .Where(p => p.Id != product.Id).Take(4).ToList();
+        ViewBag.Related = related;
         ViewData["Title"] = product.Name;
         return View(product);
     }
 
     public async Task<IActionResult> QuickView(int id)
     {
-        var product = await _db.Products.AsNoTracking().Include(p => p.Category).FirstOrDefaultAsync(p => p.Id == id);
+        var product = await _db.GetProductByIdAsync(id);
         if (product is null) return NotFound();
         return PartialView("_QuickView", product);
     }
