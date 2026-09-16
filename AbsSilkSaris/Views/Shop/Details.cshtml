@@ -26,11 +26,20 @@
 }
 </script>
 }
-<nav class="container-xl breadcrumb"><a asp-controller="Home" asp-action="Index">Home</a> / <a asp-controller="Shop" asp-action="Index" asp-route-category="@Model.Category?.Slug">@Model.Category?.Name</a> / @Model.Name</nav>
+<nav class="container-xl breadcrumb"><a asp-controller="Home" asp-action="Index">Home</a> / <a asp-controller="Shop" asp-action="Index" asp-route-category="@Model.Category?.Slug">@Model.Category?.Name</a>@if (Model.SubCategory is not null) { <text> / </text><a asp-controller="Shop" asp-action="Index" asp-route-category="@Model.Category?.Slug" asp-route-subcategory="@Model.SubCategory.Slug">@Model.SubCategory.Name</a> } / @Model.Name</nav>
 <section class="section pt-3">
     <div class="container-xl pdp">
         <div class="pdp-image">
             <img src="@Model.ImageUrl" alt="@Model.Name" width="800" height="1066" />
+            @if (Model.Images.Count > 1)
+            {
+                <div class="d-flex gap-2 mt-2 flex-wrap">
+                    @foreach (var img in Model.Images)
+                    {
+                        <img src="@img.ImageUrl" alt="" style="width:72px;height:96px;object-fit:cover;border-radius:8px" />
+                    }
+                </div>
+            }
         </div>
         <div>
             <p class="sku">@Model.Sku · @Model.Weave · @Model.Color</p>

@@ -1,13 +1,12 @@
 using AbsSilkSaris.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AbsSilkSaris.Controllers;
 
 public class OrderController : Controller
 {
-    private readonly ApplicationDbContext _db;
-    public OrderController(ApplicationDbContext db) => _db = db;
+    private readonly CatalogRepository _db;
+    public OrderController(CatalogRepository db) => _db = db;
 
     public IActionResult Track()
     {
@@ -15,13 +14,11 @@ public class OrderController : Controller
         return View();
     }
 
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Track(string orderNumber, string email)
     {
         ViewData["Title"] = "Track your order";
-        var order = await _db.Orders.Include(o => o.Items)
-            .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber && o.Email == email);
+        var order = await _db.GetOrderByNumberAsync(orderNumber, email);
         if (order is null)
         {
             ViewBag.Error = "We could not find an order with that number and email.";

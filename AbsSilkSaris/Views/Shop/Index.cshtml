@@ -28,6 +28,23 @@
                         }
                     </select>
                 </div>
+                <div class="col-md-3">
+                    <label>Subcategory</label>
+                    <select name="subcategory" class="form-select" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        @foreach (var s in Model.SubCategories)
+                        {
+                            if (Model.SubCategorySlug == s.Slug)
+                            {
+                                <option value="@s.Slug" selected>@s.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@s.Slug">@s.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
                 <div class="col-md-2">
                     <label>Colour</label>
                     <select name="color" class="form-select" onchange="this.form.submit()">

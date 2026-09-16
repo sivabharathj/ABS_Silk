@@ -1,0 +1,21 @@
+@{
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="admin-login">
+    <h1 class="serif">Atelier login</h1>
+    <p class="text-muted">Manage categories, subcategories, images and the top menu.</p>
+    @if (ViewBag.Error is string err)
+    {
+        <p class="text-danger">@err</p>
+    }
+    <form method="post" class="form-luxury">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+        <label>Username</label>
+        <input class="form-control mb-3" name="username" value="admin" required />
+        <label>Password</label>
+        <input class="form-control mb-3" type="password" name="password" required />
+        <button class="btn-gold" type="submit">Enter</button>
+        <p class="small mt-3 text-muted">Default: admin / Admin@123</p>
+    </form>
+</div>

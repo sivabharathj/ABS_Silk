@@ -1,0 +1,21 @@
+@{
+    var orders = ViewBag.Orders as List<AbsSilkSaris.Models.Order> ?? new();
+}
+<h1 class="serif">Dashboard</h1>
+<p class="text-muted">ADO.NET catalog — add a category or subcategory and it appears in the storefront top menu when “Show in menu” is enabled.</p>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="summary-box"><h3>@ViewBag.Categories</h3><p>Categories</p></div></div>
+    <div class="col-md-3"><div class="summary-box"><h3>@ViewBag.SubCategories</h3><p>Subcategories</p></div></div>
+    <div class="col-md-3"><div class="summary-box"><h3>@ViewBag.Products</h3><p>Products</p></div></div>
+    <div class="col-md-3"><div class="summary-box"><h3>@ViewBag.OrderCount</h3><p>Orders</p></div></div>
+</div>
+<h2 class="h4 serif">Recent orders</h2>
+<table class="table">
+    <thead><tr><th>Number</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var o in orders.Take(12))
+    {
+        <tr><td>@o.OrderNumber</td><td>@o.CustomerName</td><td>₹@o.Total.ToString("N0")</td><td>@o.Status</td></tr>
+    }
+    </tbody>
+</table>

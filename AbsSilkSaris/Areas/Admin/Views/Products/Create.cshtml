@@ -1,0 +1,31 @@
+@model Product
+@{
+    var cats = ViewBag.Categories as List<Category> ?? new();
+    var subs = ViewBag.SubCategories as List<SubCategory> ?? new();
+}
+<h1 class="serif">New product</h1>
+<form method="post" enctype="multipart/form-data" class="form-luxury">
+    @Html.AntiForgeryToken()
+    <partial name="_ProductFields" model="Model" />
+    <label>Primary image</label>
+    <input class="form-control mb-3" type="file" name="primaryImage" accept="image/*" />
+    <label>Gallery images</label>
+    <input class="form-control mb-3" type="file" name="gallery" accept="image/*" multiple />
+    <button class="btn-gold" type="submit">Publish</button>
+    <a class="btn-outline-maroon ms-2" asp-action="Index">Cancel</a>
+</form>
+@section Scripts {
+<script>
+  const subs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(subs.Select(s => new { s.Id, s.CategoryId, s.Name })));
+  const cat = document.getElementById('CategoryId');
+  const sub = document.getElementById('SubCategoryId');
+  function filterSubs() {
+    const cid = parseInt(cat.value || '0', 10);
+    const current = sub.value;
+    sub.innerHTML = '<option value="0">None</option>' + subs.filter(s => s.CategoryId === cid).map(s => `<option value="${s.Id}">${s.Name}</option>`).join('');
+    if ([...sub.options].some(o => o.value === current)) sub.value = current;
+  }
+  cat.addEventListener('change', filterSubs);
+  filterSubs();
+</script>
+}

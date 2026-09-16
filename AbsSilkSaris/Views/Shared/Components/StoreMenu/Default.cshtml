@@ -1,0 +1,41 @@
+@model List<AbsSilkSaris.Models.MenuCategory>
+<nav class="mega-nav d-none d-lg-block" aria-label="Primary">
+    <div class="container-xl">
+        <ul class="mega-list">
+            <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+            @foreach (var item in Model)
+            {
+                var cat = item.Category;
+                <li class="has-mega">
+                    <a asp-area="" asp-controller="Shop" asp-action="Index" asp-route-category="@cat.Slug">@cat.Name <i class="bi bi-chevron-down"></i></a>
+                    @if (item.SubCategories.Any())
+                    {
+                        <div class="mega-panel">
+                            <div class="container-xl mega-grid mega-grid-cats">
+                                <div>
+                                    <p class="mega-label">@cat.Name</p>
+                                    <a asp-area="" asp-controller="Shop" asp-action="Index" asp-route-category="@cat.Slug">Shop all @cat.Name</a>
+                                    @foreach (var sub in item.SubCategories)
+                                    {
+                                        <a asp-area="" asp-controller="Shop" asp-action="Index" asp-route-category="@cat.Slug" asp-route-subcategory="@sub.Slug">@sub.Name</a>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(cat.ImageUrl))
+                                {
+                                    <a class="mega-feature" asp-area="" asp-controller="Shop" asp-action="Index" asp-route-category="@cat.Slug">
+                                        <img src="@cat.ImageUrl" alt="@cat.Name" width="280" height="360" />
+                                        <span>@cat.Name · Shop now</span>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </li>
+            }
+            <li><a asp-area="" asp-controller="Shop" asp-action="Index" asp-route-sort="newest">New Arrivals</a></li>
+            <li><a asp-area="" asp-controller="Home" asp-action="About">Heritage</a></li>
+            <li><a asp-area="" asp-controller="Order" asp-action="Track">Track Order</a></li>
+            <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+        </ul>
+    </div>
+</nav>

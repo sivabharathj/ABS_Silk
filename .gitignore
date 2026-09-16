@@ -19,3 +19,6 @@ app.db
 .vscode/
 *.swp
 .env
+wwwroot/uploads/**
+!wwwroot/uploads/.gitkeep
+

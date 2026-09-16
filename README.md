@@ -1,17 +1,15 @@
 # ABS Silk Saris
 
-Premium luxury e-commerce storefront for **ABS Silk Saris** — authentic Kanchipuram / Kanjivaram silk sarees. The experience is modelled on leading silk houses (including the editorial, collection-led feel of [Hayagrivas Silk House](https://hayagrivassilkhouse.com/)): heritage storytelling, large photography, gold-and-maroon atelier styling, and a complete shop flow.
+Premium Kanchipuram silk storefront with an **ADO.NET** catalog and an **admin login** that drives categories, subcategories, product images, site options, and the top menu.
 
 ## Stack
 
 - ASP.NET Core 8 MVC
 - Bootstrap 5, HTML5, CSS3, JavaScript / jQuery
-- Entity Framework Core
-- ASP.NET Identity (login / register)
-- **SQLite** out of the box for local and Cloud Agent runs
-- **SQL Server** ready (switch the provider)
+- **ADO.NET** (`Microsoft.Data.Sqlite` locally, `Microsoft.Data.SqlClient` for SQL Server)
+- Cookie authentication for staff (not Entity Framework / Identity)
 
-## Run locally
+## Run
 
 ```bash
 cd AbsSilkSaris
@@ -21,7 +19,10 @@ dotnet run --launch-profile http
 
 Open http://localhost:5058
 
-The first launch applies migrations and seeds categories, products, and reviews.
+Admin: http://localhost:5058/Admin/Account/Login  
+Default credentials: **admin** / **Admin@123**
+
+Schema is created on first launch and seed data is inserted if the catalog is empty.
 
 ## SQL Server
 
@@ -30,21 +31,15 @@ In `appsettings.json`:
 ```json
 "Database": { "Provider": "SqlServer" },
 "ConnectionStrings": {
-  "DefaultConnection": "Server=.;Database=AbsSilkSaris;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
+  "SqlServer": "Server=.;Database=AbsSilkSaris;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true"
 }
 ```
 
-Then:
+## Admin can manage
 
-```bash
-dotnet ef database update --project AbsSilkSaris
-```
+- **Categories** — become top-level menu items when “Show in menu” is on
+- **Subcategories** — appear in that category’s dropdown
+- **Products & images** — primary + gallery uploads
+- **Site options** — hero copy/images, announcement, WhatsApp, address
 
-## Features
-
-- Homepage: hero, featured categories, new arrivals, best-seller carousel, heritage parallax, why-us, weaving video, reviews, Instagram grid, newsletter, footer
-- Mega menu, search, product filters, quick view, wishlist, cart, checkout, order tracking
-- WhatsApp concierge, schema.org markup, lazy-loaded images, mobile-first layout
-- Policies: privacy, terms, shipping, returns
-
-Sample login is self-service via **Register** (email confirmation is disabled in development).
+Changes show on the public storefront immediately.

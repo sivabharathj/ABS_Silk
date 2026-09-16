@@ -1,17 +1,22 @@
 ﻿@model AbsSilkSaris.ViewModels.HomeViewModel
 @{
     ViewData["MetaDescription"] = "Authentic Kanchipuram silk sarees for every celebration. Bridal, wedding, pure zari and soft silks from ABS Silk Saris.";
+    var settings = ViewBag.Settings as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var hero1 = settings.GetValueOrDefault("HeroImage1", "/images/hero/hero-kanchipuram-saree.png");
+    var hero2 = settings.GetValueOrDefault("HeroImage2", "/images/hero/hero-ivory-palace.png");
+    var heading = settings.GetValueOrDefault("HeroHeading", "Timeless Elegance in Every Weave");
+    var sub = settings.GetValueOrDefault("HeroSubheading", "Authentic Kanchipuram Silk Sarees for Every Celebration");
 }
 
 <section class="hero" aria-label="Brand banner">
-    <div class="hero-slide active" style="background-image:url('/images/hero/hero-kanchipuram-saree.png')"></div>
-    <div class="hero-slide" style="background-image:url('/images/hero/hero-ivory-palace.png')"></div>
+    <div class="hero-slide active" style="background-image:url('@hero1')"></div>
+    <div class="hero-slide" style="background-image:url('@hero2')"></div>
     <div class="hero-overlay"></div>
     <div class="container-xl hero-content">
         <div>
             <p class="eyebrow">ABS Silk Saris · Kanchipuram</p>
-            <h1>Timeless Elegance in Every Weave</h1>
-            <p class="lead">Authentic Kanchipuram Silk Sarees for Every Celebration</p>
+            <h1>@heading</h1>
+            <p class="lead">@sub</p>
             <div class="d-flex flex-wrap gap-3 mt-4">
                 <a class="btn-gold" asp-controller="Shop" asp-action="Index">Shop Collection</a>
                 <a class="btn-ghost" asp-controller="Shop" asp-action="Index" asp-route-sort="newest">Explore New Arrivals</a>

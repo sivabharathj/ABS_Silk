@@ -1,0 +1,40 @@
+@model SubCategory
+@{
+    var cats = ViewBag.Categories as List<Category> ?? new();
+}
+<h1 class="serif">@(Model.Id == 0 ? "New subcategory" : "Edit subcategory")</h1>
+<form method="post" enctype="multipart/form-data" class="form-luxury" style="max-width:640px">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="ImageUrl" />
+    <label>Parent category</label>
+    <select class="form-select mb-3" asp-for="CategoryId" required>
+        <option value="0">Choose…</option>
+        @foreach (var c in cats)
+        {
+            <option value="@c.Id">@c.Name</option>
+        }
+    </select>
+    <label>Name</label>
+    <input class="form-control mb-3" asp-for="Name" required />
+    <label>Slug</label>
+    <input class="form-control mb-3" asp-for="Slug" />
+    <label>Description</label>
+    <textarea class="form-control mb-3" asp-for="Description" rows="3"></textarea>
+    <label>Sort order</label>
+    <input class="form-control mb-3" asp-for="SortOrder" type="number" />
+    <label>Image</label>
+    <input class="form-control mb-3" type="file" name="image" accept="image/*" />
+    <div class="form-check mb-2">
+        <input type="hidden" name="IsActive" value="false" />
+        <input class="form-check-input" type="checkbox" name="IsActive" value="true" @(Model.IsActive ? "checked" : null) />
+        <label class="form-check-label">Active</label>
+    </div>
+    <div class="form-check mb-3">
+        <input type="hidden" name="ShowInMenu" value="false" />
+        <input class="form-check-input" type="checkbox" name="ShowInMenu" value="true" @(Model.ShowInMenu ? "checked" : null) />
+        <label class="form-check-label">Show under parent in top menu</label>
+    </div>
+    <button class="btn-gold" type="submit">Save</button>
+    <a class="btn-outline-maroon ms-2" asp-action="Index">Cancel</a>
+</form>
