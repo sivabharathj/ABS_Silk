@@ -1,0 +1,74 @@
+@model AbsSilkSaris.Models.Product
+@{
+    var related = ViewBag.Related as List<AbsSilkSaris.Models.Product> ?? new();
+}
+@section Head {
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "Product",
+  "name": "@Model.Name",
+  "image": "@($"{Context.Request.Scheme}://{Context.Request.Host}{Model.ImageUrl}")",
+  "description": "@Model.Description",
+  "sku": "@Model.Sku",
+  "brand": { "@@type": "Brand", "name": "ABS Silk Saris" },
+  "offers": {
+    "@@type": "Offer",
+    "priceCurrency": "INR",
+    "price": "@Model.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)",
+    "availability": "https://schema.org/InStock"
+  },
+  "aggregateRating": {
+    "@@type": "AggregateRating",
+    "ratingValue": "@Model.Rating",
+    "reviewCount": "@Model.ReviewCount"
+  }
+}
+</script>
+}
+<nav class="container-xl breadcrumb"><a asp-controller="Home" asp-action="Index">Home</a> / <a asp-controller="Shop" asp-action="Index" asp-route-category="@Model.Category?.Slug">@Model.Category?.Name</a> / @Model.Name</nav>
+<section class="section pt-3">
+    <div class="container-xl pdp">
+        <div class="pdp-image">
+            <img src="@Model.ImageUrl" alt="@Model.Name" width="800" height="1066" />
+        </div>
+        <div>
+            <p class="sku">@Model.Sku · @Model.Weave · @Model.Color</p>
+            <h1 class="serif" style="font-size:2.6rem;color:var(--maroon)">@Model.Name</h1>
+            <div class="stars mb-2">★★★★★ <span class="small text-muted">@Model.Rating.ToString("0.0") · @Model.ReviewCount reviews</span></div>
+            <p class="fs-3 price">₹@Model.Price.ToString("N0")
+                @if (Model.CompareAtPrice is > 0)
+                {
+                    <s class="fs-6">₹@Model.CompareAtPrice.Value.ToString("N0")</s>
+                    <span class="badge-sale position-static ms-2">@Model.DiscountPercent% off</span>
+                }
+            </p>
+            <p>@Model.Description</p>
+            <ul class="text-muted">
+                <li>Occasion: @Model.Occasion</li>
+                <li>Pure mulberry silk · authentic zari</li>
+                <li>Blouse piece included · dry clean</li>
+                <li>@Model.Stock pieces on the floor</li>
+            </ul>
+            <form asp-controller="Cart" asp-action="Add" method="post" class="qty-row mt-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <input type="number" name="qty" value="1" min="1" max="5" aria-label="Quantity" />
+                <button class="btn-gold" type="submit">Add to cart</button>
+                <button class="btn-outline-maroon" type="button" data-wish="@Model.Id">Wishlist</button>
+            </form>
+        </div>
+    </div>
+    @if (related.Any())
+    {
+        <div class="container-xl mt-5">
+            <h2 class="serif" style="color:var(--maroon)">You may also love</h2>
+            <div class="product-grid mt-4">
+                @foreach (var p in related)
+                {
+                    <partial name="_ProductCard" model="p" />
+                }
+            </div>
+        </div>
+    }
+</section>

@@ -1,0 +1,35 @@
+@model AbsSilkSaris.ViewModels.CheckoutViewModel
+<section class="section">
+    <div class="container-xl">
+        <h1 class="serif" style="color:var(--maroon)">Secure Checkout</h1>
+        <p class="text-muted">SSL encrypted · Pay on confirmation with our concierge or complete details below.</p>
+        <div class="row g-4 mt-2">
+            <div class="col-lg-7">
+                <form asp-action="Place" method="post" class="form-luxury">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6"><label>Full name</label><input class="form-control" name="CustomerName" required /></div>
+                        <div class="col-md-6"><label>Email</label><input class="form-control" type="email" name="Email" required /></div>
+                        <div class="col-md-6"><label>Phone</label><input class="form-control" name="Phone" required /></div>
+                        <div class="col-12"><label>Address</label><input class="form-control" name="Address" required /></div>
+                        <div class="col-md-4"><label>City</label><input class="form-control" name="City" required /></div>
+                        <div class="col-md-4"><label>State</label><input class="form-control" name="State" value="Tamil Nadu" /></div>
+                        <div class="col-md-4"><label>PIN</label><input class="form-control" name="Pincode" required /></div>
+                    </div>
+                    <button class="btn-gold mt-4" type="submit">Place order</button>
+                </form>
+            </div>
+            <div class="col-lg-5">
+                <div class="summary-box">
+                    @foreach (var l in Model.Lines)
+                    {
+                        <p class="d-flex justify-content-between"><span>@l.Name × @l.Quantity</span><span>₹@((l.Price * l.Quantity).ToString("N0"))</span></p>
+                    }
+                    <hr />
+                    <p>Shipping: @(Model.Shipping == 0 ? "Complimentary" : $"₹{Model.Shipping:N0}")</p>
+                    <p class="fs-5"><strong>Total ₹@Model.Total.ToString("N0")</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

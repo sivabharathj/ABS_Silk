@@ -1,0 +1,31 @@
+@model AbsSilkSaris.Models.Order?
+<section class="section">
+    <div class="container-xl" style="max-width:720px">
+        <h1 class="serif" style="color:var(--maroon)">Track your order</h1>
+        <form method="post" class="form-luxury mt-3">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-6"><label>Order number</label><input class="form-control" name="orderNumber" required placeholder="ABS…" /></div>
+                <div class="col-md-6"><label>Email</label><input class="form-control" type="email" name="email" required /></div>
+            </div>
+            <button class="btn-gold mt-3" type="submit">Look up</button>
+        </form>
+        @if (ViewBag.Error is string err)
+        {
+            <p class="mt-3 text-danger">@err</p>
+        }
+        @if (Model is not null)
+        {
+            <div class="summary-box mt-4">
+                <h3>@Model.OrderNumber</h3>
+                <p>Status: <strong>@Model.Status</strong> · @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</p>
+                <p>@Model.CustomerName · @Model.City</p>
+                @foreach (var i in Model.Items)
+                {
+                    <p>@i.ProductName × @i.Quantity — ₹@i.UnitPrice.ToString("N0")</p>
+                }
+                <p class="fs-5">Total ₹@Model.Total.ToString("N0")</p>
+            </div>
+        }
+    </div>
+</section>

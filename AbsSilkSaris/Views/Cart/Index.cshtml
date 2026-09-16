@@ -1,0 +1,60 @@
+@model List<AbsSilkSaris.Models.CartLine>
+<section class="section">
+    <div class="container-xl">
+        <h1 class="serif" style="color:var(--maroon)">Shopping Cart</h1>
+        @if (!Model.Any())
+        {
+            <p class="mt-4">Your atelier cart is empty.</p>
+            <a class="btn-gold" asp-controller="Shop" asp-action="Index">Shop Collection</a>
+        }
+        else
+        {
+            <div class="row g-4 mt-2">
+                <div class="col-lg-8">
+                    <table class="table cart-table align-middle">
+                        <thead><tr><th>Silk</th><th></th><th>Price</th><th>Qty</th><th></th></tr></thead>
+                        <tbody>
+                        @foreach (var line in Model)
+                        {
+                            <tr>
+                                <td><img src="@line.ImageUrl" alt="" /></td>
+                                <td>@line.Name</td>
+                                <td>₹@line.Price.ToString("N0")</td>
+                                <td>
+                                    <form asp-action="Update" method="post" class="d-flex gap-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@line.ProductId" />
+                                        <input type="number" name="qty" value="@line.Quantity" min="1" style="width:72px" />
+                                        <button class="btn-outline-maroon" type="submit">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form asp-action="Remove" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@line.ProductId" />
+                                        <button class="btn-reset" type="submit">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-4">
+                    @{
+                        var sub = Model.Sum(x => x.Price * x.Quantity);
+                        var ship = sub >= 15000 ? 0 : 350;
+                    }
+                    <div class="summary-box">
+                        <h3 class="serif">Order summary</h3>
+                        <p class="d-flex justify-content-between"><span>Subtotal</span><span>₹@sub.ToString("N0")</span></p>
+                        <p class="d-flex justify-content-between"><span>Shipping</span><span>@(ship == 0 ? "Complimentary" : $"₹{ship}")</span></p>
+                        <hr />
+                        <p class="d-flex justify-content-between fs-5"><strong>Total</strong><strong>₹{(sub + ship).ToString("N0")}</strong></p>
+                        <a class="btn-gold w-100" asp-controller="Checkout" asp-action="Index">Secure checkout</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

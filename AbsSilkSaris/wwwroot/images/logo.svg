@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="ABS Silk Saris">
+  <rect width="64" height="64" rx="8" fill="#6B1D2A"/>
+  <rect x="3" y="3" width="58" height="58" rx="6" fill="none" stroke="#C9A227" stroke-width="1.5"/>
+  <text x="32" y="30" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#F4E9D2" font-weight="700">ABS</text>
+  <text x="32" y="46" text-anchor="middle" font-family="Georgia, serif" font-size="7" fill="#C9A227" letter-spacing="2">SILK</text>
+</svg>

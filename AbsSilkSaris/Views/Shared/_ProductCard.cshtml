@@ -1,0 +1,32 @@
+@model AbsSilkSaris.Models.Product
+<article class="product-card">
+    <div class="product-media">
+        <a asp-controller="Shop" asp-action="Details" asp-route-slug="@Model.Slug">
+            <img src="@Model.ImageUrl" alt="@Model.Name" width="480" height="640" loading="lazy" />
+        </a>
+        @if (Model.DiscountPercent > 0)
+        {
+            <span class="badge-sale">@Model.DiscountPercent% off</span>
+        }
+        @if (Model.IsNew)
+        {
+            <span class="badge-new">New</span>
+        }
+        <div class="product-actions">
+            <button class="chip-btn" type="button" data-quickview="@Model.Id" title="Quick view"><i class="bi bi-eye"></i></button>
+            <button class="chip-btn" type="button" data-wish="@Model.Id" title="Wishlist"><i class="bi bi-heart"></i></button>
+        </div>
+    </div>
+    <div class="product-body">
+        <div class="meta">@Model.Category?.Name · @Model.Color</div>
+        <h3><a asp-controller="Shop" asp-action="Details" asp-route-slug="@Model.Slug">@Model.Name</a></h3>
+        <div class="price">
+            ₹@Model.Price.ToString("N0")
+            @if (Model.CompareAtPrice is > 0)
+            {
+                <s>₹@Model.CompareAtPrice.Value.ToString("N0")</s>
+            }
+        </div>
+        <button class="add-full" type="button" data-add-cart="@Model.Id">Add to cart</button>
+    </div>
+</article>
