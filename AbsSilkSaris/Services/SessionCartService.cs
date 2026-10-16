@@ -9,30 +9,71 @@ public class SessionCartService
     private const string WishKey = "ABS_WISH";
     private readonly IHttpContextAccessor _http;
 
-    public SessionCartService(IHttpContextAccessor http) => _http = http;
+    public SessionCartService(IHttpContextAccessor http)
+    {
+        _http = http;
+    }
 
-    private ISession Session => _http.HttpContext!.Session;
+    private ISession Session
+    {
+        get { return _http.HttpContext!.Session; }
+    }
 
-    public List<CartLine> GetCart() =>
-        JsonSerializer.Deserialize<List<CartLine>>(Session.GetString(CartKey) ?? "[]") ?? new();
+    public List<CartLine> GetCart()
+    {
+        string json = Session.GetString(CartKey);
+        if (string.IsNullOrEmpty(json))
+        {
+            return new List<CartLine>();
+        }
+        List<CartLine>? list = JsonSerializer.Deserialize<List<CartLine>>(json);
+        if (list == null)
+        {
+            return new List<CartLine>();
+        }
+        return list;
+    }
 
-    public List<WishlistLine> GetWishlist() =>
-        JsonSerializer.Deserialize<List<WishlistLine>>(Session.GetString(WishKey) ?? "[]") ?? new();
+    public List<WishlistLine> GetWishlist()
+    {
+        string json = Session.GetString(WishKey);
+        if (string.IsNullOrEmpty(json))
+        {
+            return new List<WishlistLine>();
+        }
+        List<WishlistLine>? list = JsonSerializer.Deserialize<List<WishlistLine>>(json);
+        if (list == null)
+        {
+            return new List<WishlistLine>();
+        }
+        return list;
+    }
 
-    public void SaveCart(List<CartLine> lines) =>
+    public void SaveCart(List<CartLine> lines)
+    {
         Session.SetString(CartKey, JsonSerializer.Serialize(lines));
+    }
 
-    public void SaveWishlist(List<WishlistLine> lines) =>
+    public void SaveWishlist(List<WishlistLine> lines)
+    {
         Session.SetString(WishKey, JsonSerializer.Serialize(lines));
+    }
 
-    public int CartCount => GetCart().Sum(x => x.Quantity);
-    public int WishlistCount => GetWishlist().Count;
+    public int CartCount
+    {
+        get { return CollectionHelper.CartQuantity(GetCart()); }
+    }
+
+    public int WishlistCount
+    {
+        get { return GetWishlist().Count; }
+    }
 
     public void AddToCart(Product product, int qty = 1)
     {
         var cart = GetCart();
-        var existing = cart.FirstOrDefault(x => x.ProductId == product.Id);
-        if (existing is null)
+        var existing = CollectionHelper.FindCartLine(cart, product.Id);
+        if (existing == null)
         {
             cart.Add(new CartLine
             {
@@ -53,8 +94,8 @@ public class SessionCartService
     public void ToggleWishlist(Product product)
     {
         var list = GetWishlist();
-        var existing = list.FirstOrDefault(x => x.ProductId == product.Id);
-        if (existing is null)
+        var existing = CollectionHelper.FindWishLine(list, product.Id);
+        if (existing == null)
         {
             list.Add(new WishlistLine
             {
@@ -71,5 +112,8 @@ public class SessionCartService
         SaveWishlist(list);
     }
 
-    public void ClearCart() => SaveCart(new List<CartLine>());
+    public void ClearCart()
+    {
+        SaveCart(new List<CartLine>());
+    }
 }

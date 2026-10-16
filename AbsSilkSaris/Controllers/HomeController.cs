@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using AbsSilkSaris.Data;
 using AbsSilkSaris.Models;
+using AbsSilkSaris.Services;
 using AbsSilkSaris.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,19 +10,21 @@ namespace AbsSilkSaris.Controllers;
 public class HomeController : Controller
 {
     private readonly CatalogRepository _db;
-    public HomeController(CatalogRepository db) => _db = db;
+
+    public HomeController(CatalogRepository db)
+    {
+        _db = db;
+    }
 
     public async Task<IActionResult> Index()
     {
         var settings = await _db.GetSettingsAsync();
         ViewBag.Settings = settings;
-        var model = new HomeViewModel
-        {
-            Categories = await _db.GetCategoriesAsync(activeOnly: true),
-            NewArrivals = (await _db.SearchProductsAsync(null, null, null, null, "newest", null, null, isNew: true)).Take(8).ToList(),
-            BestSellers = (await _db.SearchProductsAsync(null, null, null, null, "featured", null, null, best: true)).Take(10).ToList(),
-            Reviews = await _db.GetReviewsAsync()
-        };
+        var model = new HomeViewModel();
+        model.Categories = await _db.GetCategoriesAsync(activeOnly: true);
+        model.NewArrivals = await _db.SearchProductsAsync(null, null, null, null, "newest", null, null, isNew: true, maxRows: 8);
+        model.BestSellers = await _db.SearchProductsAsync(null, null, null, null, "featured", null, null, best: true, maxRows: 10);
+        model.Reviews = await _db.GetReviewsAsync();
         ViewData["Title"] = settings.GetValueOrDefault("HeroHeading", "Timeless Elegance in Every Weave");
         return View(model);
     }
@@ -46,10 +49,29 @@ public class HomeController : Controller
         return RedirectToAction(nameof(Contact));
     }
 
-    public IActionResult Privacy() { ViewData["Title"] = "Privacy Policy"; return View(); }
-    public IActionResult Terms() { ViewData["Title"] = "Terms & Conditions"; return View(); }
-    public IActionResult Shipping() { ViewData["Title"] = "Shipping Policy"; return View(); }
-    public IActionResult Returns() { ViewData["Title"] = "Return Policy"; return View(); }
+    public IActionResult Privacy()
+    {
+        ViewData["Title"] = "Privacy Policy";
+        return View();
+    }
+
+    public IActionResult Terms()
+    {
+        ViewData["Title"] = "Terms & Conditions";
+        return View();
+    }
+
+    public IActionResult Shipping()
+    {
+        ViewData["Title"] = "Shipping Policy";
+        return View();
+    }
+
+    public IActionResult Returns()
+    {
+        ViewData["Title"] = "Return Policy";
+        return View();
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -64,5 +86,8 @@ public class HomeController : Controller
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error() => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
 }

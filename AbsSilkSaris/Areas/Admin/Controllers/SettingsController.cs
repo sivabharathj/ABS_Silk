@@ -22,8 +22,12 @@ public class SettingsController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Index(IFormCollection form, IFormFile? hero1, IFormFile? hero2)
     {
-        foreach (var key in form.Keys.Where(k => k != "__RequestVerificationToken"))
+        foreach (var key in form.Keys)
         {
+            if (key == "__RequestVerificationToken")
+            {
+                continue;
+            }
             await _db.UpsertSettingAsync(key, form[key].ToString());
         }
         var h1 = await _images.SaveAsync(hero1, "hero");

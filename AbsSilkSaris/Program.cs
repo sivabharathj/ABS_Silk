@@ -12,21 +12,9 @@ builder.Services.AddScoped<ImageUploadService>();
 builder.Services.AddScoped<SessionCartService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromDays(14);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.Cookie.Name = ".AbsSilkSaris.Session";
-});
+builder.Services.AddSession(ConfigureSession);
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Admin/Account/Login";
-        options.AccessDeniedPath = "/Admin/Account/Login";
-        options.Cookie.Name = ".AbsSilkSaris.Admin";
-        options.ExpireTimeSpan = TimeSpan.FromHours(12);
-    });
+    .AddCookie(ConfigureCookie);
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
 
@@ -59,3 +47,19 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+static void ConfigureSession(SessionOptions options)
+{
+    options.IdleTimeout = TimeSpan.FromDays(14);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".AbsSilkSaris.Session";
+}
+
+static void ConfigureCookie(CookieAuthenticationOptions options)
+{
+    options.LoginPath = "/Admin/Account/Login";
+    options.AccessDeniedPath = "/Admin/Account/Login";
+    options.Cookie.Name = ".AbsSilkSaris.Admin";
+    options.ExpireTimeSpan = TimeSpan.FromHours(12);
+}

@@ -8,6 +8,7 @@ Premium Kanchipuram silk storefront with an **ADO.NET** catalog and an **admin l
 - Bootstrap 5, HTML5, CSS3, JavaScript / jQuery
 - **ADO.NET** (`Microsoft.Data.Sqlite` locally, `Microsoft.Data.SqlClient` for SQL Server)
 - Cookie authentication for staff (not Entity Framework / Identity)
+- No Entity Framework and no C# lambda / LINQ expressions — catalog access uses parameterized ADO.NET commands, loops, and named mapper methods
 
 ## Run
 

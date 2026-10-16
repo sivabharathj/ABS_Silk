@@ -5,7 +5,10 @@ namespace AbsSilkSaris.Data;
 public class SchemaBootstrapper
 {
     private readonly IDbConnectionFactory _factory;
-    public SchemaBootstrapper(IDbConnectionFactory factory) => _factory = factory;
+    public SchemaBootstrapper(IDbConnectionFactory factory)
+    {
+        _factory = factory;
+    }
 
     public async Task EnsureCreatedAsync()
     {
@@ -279,7 +282,62 @@ public class SchemaBootstrapper
 public class CatalogSeeder
 {
     private readonly CatalogRepository _db;
-    public CatalogSeeder(CatalogRepository db) => _db = db;
+    public CatalogSeeder(CatalogRepository db)
+    {
+        _db = db;
+    }
+
+    private async Task<int> InsertSeedCategory(string name, string slug, string desc, string img, int sort)
+    {
+        Models.Category category = new Models.Category();
+        category.Name = name;
+        category.Slug = slug;
+        category.Description = desc;
+        category.ImageUrl = img;
+        category.SortOrder = sort;
+        category.IsActive = true;
+        category.ShowInMenu = true;
+        return await _db.InsertCategoryAsync(category);
+    }
+
+    private async Task<int> InsertSeedSub(int cat, string name, string slug, int sort)
+    {
+        Models.SubCategory sub = new Models.SubCategory();
+        sub.CategoryId = cat;
+        sub.Name = name;
+        sub.Slug = slug;
+        sub.SortOrder = sort;
+        sub.IsActive = true;
+        sub.ShowInMenu = true;
+        sub.Description = name;
+        sub.ImageUrl = "";
+        return await _db.InsertSubCategoryAsync(sub);
+    }
+
+    private async Task InsertSeedProduct(string name, string sku, int cat, int? sub, decimal price, decimal? compare, string img, string color, string weave, string occasion, bool isNew, bool best, string desc)
+    {
+        Models.Product product = new Models.Product();
+        product.Name = name;
+        product.Slug = sku.ToLowerInvariant();
+        product.Sku = sku;
+        product.CategoryId = cat;
+        product.SubCategoryId = sub;
+        product.Price = price;
+        product.CompareAtPrice = compare;
+        product.ImageUrl = img;
+        product.Color = color;
+        product.Weave = weave;
+        product.Occasion = occasion;
+        product.IsNew = isNew;
+        product.IsBestSeller = best;
+        product.IsActive = true;
+        product.Description = desc;
+        product.Rating = 4.8;
+        product.ReviewCount = 12;
+        product.Stock = 8;
+        int id = await _db.InsertProductAsync(product);
+        await _db.AddProductImageAsync(id, img, 0, true);
+    }
 
     public async Task SeedAsync()
     {
@@ -301,80 +359,42 @@ public class CatalogSeeder
         await _db.UpsertSettingAsync("HeroImage1", "/images/hero/hero-kanchipuram-saree.png");
         await _db.UpsertSettingAsync("HeroImage2", "/images/hero/hero-ivory-palace.png");
 
-        async Task<int> C(string name, string slug, string desc, string img, int sort) =>
-            await _db.InsertCategoryAsync(new Models.Category
-            {
-                Name = name, Slug = slug, Description = desc, ImageUrl = img, SortOrder = sort, IsActive = true, ShowInMenu = true
-            });
+        var bridal = await InsertSeedCategory("Bridal Silk Sarees", "bridal-silk-sarees", "Auspicious silks woven for timeless bridal moments.", "/images/categories/category-bridal.png", 1);
+        var wedding = await InsertSeedCategory("Wedding Collection", "wedding-collection", "Heirloom Kanchipurams for every wedding ritual.", "/images/categories/category-wedding.png", 2);
+        var zari = await InsertSeedCategory("Pure Zari Sarees", "pure-zari-sarees", "Authentic gold zari that catches temple light.", "/images/categories/category-zari.png", 3);
+        var traditional = await InsertSeedCategory("Traditional Kanchipuram Sarees", "traditional-kanchipuram-sarees", "Classic korvai borders and temple motifs.", "/images/categories/category-traditional.png", 4);
+        var soft = await InsertSeedCategory("Soft Silk Sarees", "soft-silk-sarees", "Lighter weaves for festive days and easy drape.", "/images/categories/category-softsilk.png", 5);
+        var party = await InsertSeedCategory("Party Wear Silk Sarees", "party-wear-silk-sarees", "Statement silks for evenings worth dressing up.", "/images/categories/category-party.png", 6);
 
-        var bridal = await C("Bridal Silk Sarees", "bridal-silk-sarees", "Auspicious silks woven for timeless bridal moments.", "/images/categories/category-bridal.png", 1);
-        var wedding = await C("Wedding Collection", "wedding-collection", "Heirloom Kanchipurams for every wedding ritual.", "/images/categories/category-wedding.png", 2);
-        var zari = await C("Pure Zari Sarees", "pure-zari-sarees", "Authentic gold zari that catches temple light.", "/images/categories/category-zari.png", 3);
-        var traditional = await C("Traditional Kanchipuram Sarees", "traditional-kanchipuram-sarees", "Classic korvai borders and temple motifs.", "/images/categories/category-traditional.png", 4);
-        var soft = await C("Soft Silk Sarees", "soft-silk-sarees", "Lighter weaves for festive days and easy drape.", "/images/categories/category-softsilk.png", 5);
-        var party = await C("Party Wear Silk Sarees", "party-wear-silk-sarees", "Statement silks for evenings worth dressing up.", "/images/categories/category-party.png", 6);
+        var temple = await InsertSeedSub(bridal, "Temple Border Bridal", "temple-border-bridal", 1);
+        var muhurtham = await InsertSeedSub(bridal, "Muhurtham Silks", "muhurtham-silks", 2);
+        var ivory = await InsertSeedSub(wedding, "Ivory & Gold", "ivory-gold", 1);
+        var rituals = await InsertSeedSub(wedding, "Wedding Rituals", "wedding-rituals", 2);
+        var checks = await InsertSeedSub(zari, "Zari Checks", "zari-checks", 1);
+        var ganga = await InsertSeedSub(zari, "Ganga Jamuna", "ganga-jamuna", 2);
+        var korvai = await InsertSeedSub(traditional, "Korvai Contrast", "korvai-contrast", 1);
+        var kattam = await InsertSeedSub(traditional, "Kattam Checks", "kattam-checks", 2);
+        var festiveSoft = await InsertSeedSub(soft, "Festive Soft Silk", "festive-soft-silk", 1);
+        var everyday = await InsertSeedSub(soft, "Everyday Classics", "everyday-classics", 2);
+        var reception = await InsertSeedSub(party, "Reception & Sangeet", "reception-sangeet", 1);
+        var contemporary = await InsertSeedSub(party, "Contemporary Party", "contemporary-party", 2);
 
-        async Task<int> S(int cat, string name, string slug, int sort) =>
-            await _db.InsertSubCategoryAsync(new Models.SubCategory
-            {
-                CategoryId = cat, Name = name, Slug = slug, SortOrder = sort, IsActive = true, ShowInMenu = true, Description = name, ImageUrl = ""
-            });
-
-        var temple = await S(bridal, "Temple Border Bridal", "temple-border-bridal", 1);
-        var muhurtham = await S(bridal, "Muhurtham Silks", "muhurtham-silks", 2);
-        var ivory = await S(wedding, "Ivory & Gold", "ivory-gold", 1);
-        var rituals = await S(wedding, "Wedding Rituals", "wedding-rituals", 2);
-        var checks = await S(zari, "Zari Checks", "zari-checks", 1);
-        var ganga = await S(zari, "Ganga Jamuna", "ganga-jamuna", 2);
-        var korvai = await S(traditional, "Korvai Contrast", "korvai-contrast", 1);
-        var kattam = await S(traditional, "Kattam Checks", "kattam-checks", 2);
-        var festiveSoft = await S(soft, "Festive Soft Silk", "festive-soft-silk", 1);
-        var everyday = await S(soft, "Everyday Classics", "everyday-classics", 2);
-        var reception = await S(party, "Reception & Sangeet", "reception-sangeet", 1);
-        var contemporary = await S(party, "Contemporary Party", "contemporary-party", 2);
-
-        async Task P(string name, string sku, int cat, int? sub, decimal price, decimal? compare, string img, string color, string weave, string occasion, bool isNew, bool best, string desc)
-        {
-            var id = await _db.InsertProductAsync(new Models.Product
-            {
-                Name = name,
-                Slug = sku.ToLowerInvariant(),
-                Sku = sku,
-                CategoryId = cat,
-                SubCategoryId = sub,
-                Price = price,
-                CompareAtPrice = compare,
-                ImageUrl = img,
-                Color = color,
-                Weave = weave,
-                Occasion = occasion,
-                IsNew = isNew,
-                IsBestSeller = best,
-                IsActive = true,
-                Description = desc,
-                Rating = 4.8,
-                ReviewCount = 12,
-                Stock = 8
-            });
-            await _db.AddProductImageAsync(id, img, 0, true);
-        }
-
-        await P("ABS Handloom Maroon Temple Border Bridal Kanchipuram", "ABS-KBF515", bridal, temple, 42800, 48900, "/images/products/product-maroon-temple.png", "Maroon", "Temple Border", "Bridal", true, true, "A heavy bridal Kanchipuram in deep maroon with dense gold zari temple borders and peacock buttas.");
-        await P("ABS Handloom Ivory & Gold Wedding Silk", "ABS-KBF887", wedding, ivory, 36500, 41200, "/images/products/product-ivory-gold.png", "Ivory", "Zari Checks", "Wedding", true, true, "Ivory body with blush-pink contrast and gold zari — a luminous wedding silk.");
-        await P("ABS Mayilkazhuthu Peacock Blue Kanjivaram", "ABS-KBF632", traditional, korvai, 22120, 24990, "/images/products/product-peacock-blue.png", "Peacock Blue", "Korvai Contrast", "Festival", true, true, "The beloved mayil kazhuthu shade with a purple contrast border.");
-        await P("ABS Rani Pink Pure Zari Kanchipuram", "ABS-KBF836", zari, checks, 22880, null, "/images/products/product-rani-pink.png", "Rani Pink", "Butta", "Wedding", true, false, "Rani pink mulberry silk scattered with gold buttas.");
-        await P("ABS Bottle Green Checks with Maroon Border", "ABS-KBF276", traditional, kattam, 18990, 21350, "/images/products/product-bottle-green.png", "Bottle Green", "Kattam Checks", "Festival", false, true, "Fine kattam checks in bottle green silk, maroon retta pettu border.");
-        await P("ABS Honey Mustard Handloom Soft Silk", "ABS-KBF215", soft, everyday, 10950, 12400, "/images/products/product-mustard.png", "Mustard", "Soft Silk", "Everyday", true, true, "A lighter handloom soft silk in honey mustard.");
-        await P("ABS Black Ganga Jamuna Border Kanjivaram", "ABS-SSK154", zari, ganga, 24420, 26800, "/images/products/product-black-ganga.png", "Black", "Ganga Jamuna", "Party", false, true, "Deep black body with a striking red-and-gold Ganga Jamuna border.");
-        await P("ABS Pista Green Soft Silk with Gold Border", "ABS-KBF427", soft, festiveSoft, 15480, 17200, "/images/products/product-mint-soft.png", "Pista Green", "Soft Silk", "Party", true, false, "Airy pistachio silk with a delicate gold selvedge.");
-        await P("ABS Plum Purple Temple Motif Bridal Silk", "ABS-KBF835", bridal, muhurtham, 22530, 25100, "/images/products/product-plum.png", "Plum Purple", "Temple Border", "Bridal", false, true, "Plum purple bridal silk with temple motifs along the pallu.");
-        await P("ABS Bright Teal Statement Kanchipuram", "ABS-KBF673", party, reception, 40830, 44900, "/images/products/product-teal.png", "Teal", "Turning Border", "Party", true, false, "A rare teal body with dense gold threadwork.");
-        await P("ABS Araku Maroon Traditional Korvai", "ABS-KBF804", traditional, korvai, 23480, 25900, "/images/products/product-maroon-temple.png", "Maroon", "Korvai Contrast", "Wedding", false, false, "Araku maroon body, classic korvai contrast.");
-        await P("ABS Wedding Ivory Palace Silk", "ABS-KBF516", wedding, rituals, 31200, 34800, "/images/products/product-ivory-gold.png", "Ivory", "Borderless Butta", "Wedding", false, true, "When buttas become the border — an ivory Kanchipuram.");
-        await P("ABS Party Rani Pink Contemporary Silk", "ABS-KBF820", party, contemporary, 19880, 22100, "/images/products/product-rani-pink.png", "Rani Pink", "Thread Checks", "Party", true, false, "A contemporary rani pink silk for cocktail and sangeet evenings.");
-        await P("ABS Traditional Peacock Motif Green Silk", "ABS-KBF582", traditional, kattam, 20590, 22900, "/images/products/product-bottle-green.png", "Bottle Green", "Yaanai & Mayil", "Festival", false, false, "Stately peacock and yaanai motifs on bottle green silk.");
-        await P("ABS Soft Silk Mint Festive Drape", "ABS-KBF571", soft, festiveSoft, 13850, 15500, "/images/products/product-mint-soft.png", "Mint", "Soft Silk", "Festival", true, false, "Mint festive soft silk, light on the shoulder.");
-        await P("ABS Pure Zari Mustard Temple Silk", "ABS-KBF245", zari, checks, 20950, 23200, "/images/products/product-mustard.png", "Mustard", "Temple Border", "Wedding", false, true, "Mustard body, black temple border, tested gold zari.");
+        await InsertSeedProduct("ABS Handloom Maroon Temple Border Bridal Kanchipuram", "ABS-KBF515", bridal, temple, 42800, 48900, "/images/products/product-maroon-temple.png", "Maroon", "Temple Border", "Bridal", true, true, "A heavy bridal Kanchipuram in deep maroon with dense gold zari temple borders and peacock buttas.");
+        await InsertSeedProduct("ABS Handloom Ivory & Gold Wedding Silk", "ABS-KBF887", wedding, ivory, 36500, 41200, "/images/products/product-ivory-gold.png", "Ivory", "Zari Checks", "Wedding", true, true, "Ivory body with blush-pink contrast and gold zari — a luminous wedding silk.");
+        await InsertSeedProduct("ABS Mayilkazhuthu Peacock Blue Kanjivaram", "ABS-KBF632", traditional, korvai, 22120, 24990, "/images/products/product-peacock-blue.png", "Peacock Blue", "Korvai Contrast", "Festival", true, true, "The beloved mayil kazhuthu shade with a purple contrast border.");
+        await InsertSeedProduct("ABS Rani Pink Pure Zari Kanchipuram", "ABS-KBF836", zari, checks, 22880, null, "/images/products/product-rani-pink.png", "Rani Pink", "Butta", "Wedding", true, false, "Rani pink mulberry silk scattered with gold buttas.");
+        await InsertSeedProduct("ABS Bottle Green Checks with Maroon Border", "ABS-KBF276", traditional, kattam, 18990, 21350, "/images/products/product-bottle-green.png", "Bottle Green", "Kattam Checks", "Festival", false, true, "Fine kattam checks in bottle green silk, maroon retta pettu border.");
+        await InsertSeedProduct("ABS Honey Mustard Handloom Soft Silk", "ABS-KBF215", soft, everyday, 10950, 12400, "/images/products/product-mustard.png", "Mustard", "Soft Silk", "Everyday", true, true, "A lighter handloom soft silk in honey mustard.");
+        await InsertSeedProduct("ABS Black Ganga Jamuna Border Kanjivaram", "ABS-SSK154", zari, ganga, 24420, 26800, "/images/products/product-black-ganga.png", "Black", "Ganga Jamuna", "Party", false, true, "Deep black body with a striking red-and-gold Ganga Jamuna border.");
+        await InsertSeedProduct("ABS Pista Green Soft Silk with Gold Border", "ABS-KBF427", soft, festiveSoft, 15480, 17200, "/images/products/product-mint-soft.png", "Pista Green", "Soft Silk", "Party", true, false, "Airy pistachio silk with a delicate gold selvedge.");
+        await InsertSeedProduct("ABS Plum Purple Temple Motif Bridal Silk", "ABS-KBF835", bridal, muhurtham, 22530, 25100, "/images/products/product-plum.png", "Plum Purple", "Temple Border", "Bridal", false, true, "Plum purple bridal silk with temple motifs along the pallu.");
+        await InsertSeedProduct("ABS Bright Teal Statement Kanchipuram", "ABS-KBF673", party, reception, 40830, 44900, "/images/products/product-teal.png", "Teal", "Turning Border", "Party", true, false, "A rare teal body with dense gold threadwork.");
+        await InsertSeedProduct("ABS Araku Maroon Traditional Korvai", "ABS-KBF804", traditional, korvai, 23480, 25900, "/images/products/product-maroon-temple.png", "Maroon", "Korvai Contrast", "Wedding", false, false, "Araku maroon body, classic korvai contrast.");
+        await InsertSeedProduct("ABS Wedding Ivory Palace Silk", "ABS-KBF516", wedding, rituals, 31200, 34800, "/images/products/product-ivory-gold.png", "Ivory", "Borderless Butta", "Wedding", false, true, "When buttas become the border — an ivory Kanchipuram.");
+        await InsertSeedProduct("ABS Party Rani Pink Contemporary Silk", "ABS-KBF820", party, contemporary, 19880, 22100, "/images/products/product-rani-pink.png", "Rani Pink", "Thread Checks", "Party", true, false, "A contemporary rani pink silk for cocktail and sangeet evenings.");
+        await InsertSeedProduct("ABS Traditional Peacock Motif Green Silk", "ABS-KBF582", traditional, kattam, 20590, 22900, "/images/products/product-bottle-green.png", "Bottle Green", "Yaanai & Mayil", "Festival", false, false, "Stately peacock and yaanai motifs on bottle green silk.");
+        await InsertSeedProduct("ABS Soft Silk Mint Festive Drape", "ABS-KBF571", soft, festiveSoft, 13850, 15500, "/images/products/product-mint-soft.png", "Mint", "Soft Silk", "Festival", true, false, "Mint festive soft silk, light on the shoulder.");
+        await InsertSeedProduct("ABS Pure Zari Mustard Temple Silk", "ABS-KBF245", zari, checks, 20950, 23200, "/images/products/product-mustard.png", "Mustard", "Temple Border", "Wedding", false, true, "Mustard body, black temple border, tested gold zari.");
 
         await _db.InsertReviewAsync(new Models.Review { CustomerName = "Priya Venkatesh", Location = "Chennai", PhotoUrl = "/images/reviews/review-priya.png", Stars = 5, Title = "A bridal silk that felt like an heirloom", Body = "The maroon temple-border Kanchipuram I wore for my muhurtham was even more luminous in person." });
         await _db.InsertReviewAsync(new Models.Review { CustomerName = "Ananya Krishnan", Location = "Bengaluru", PhotoUrl = "/images/reviews/review-ananya.png", Stars = 5, Title = "Packaging and weave quality are exceptional", Body = "Ordered the honey mustard soft silk. It draped like a dream and arrived in museum-worthy packaging." });

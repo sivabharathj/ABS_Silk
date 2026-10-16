@@ -15,9 +15,17 @@ public sealed class DbConnectionFactory : IDbConnectionFactory
 {
     private readonly string _connectionString;
     public bool IsSqlServer { get; }
-    public string LastInsertIdSql => IsSqlServer
-        ? "SELECT CAST(SCOPE_IDENTITY() AS INT);"
-        : "SELECT last_insert_rowid();";
+    public string LastInsertIdSql
+    {
+        get
+        {
+            if (IsSqlServer)
+            {
+                return "SELECT CAST(SCOPE_IDENTITY() AS INT);";
+            }
+            return "SELECT last_insert_rowid();";
+        }
+    }
 
     public DbConnectionFactory(IConfiguration config)
     {
@@ -27,6 +35,12 @@ public sealed class DbConnectionFactory : IDbConnectionFactory
             : config.GetConnectionString("DefaultConnection")!;
     }
 
-    public IDbConnection Create() =>
-        IsSqlServer ? new SqlConnection(_connectionString) : new SqliteConnection(_connectionString);
+    public IDbConnection Create()
+    {
+        if (IsSqlServer)
+        {
+            return new SqlConnection(_connectionString);
+        }
+        return new SqliteConnection(_connectionString);
+    }
 }

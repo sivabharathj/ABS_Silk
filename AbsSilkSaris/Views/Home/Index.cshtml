@@ -146,7 +146,7 @@
                         <div>
                             <strong>@r.CustomerName</strong>
                             <div class="small text-muted">@r.Location</div>
-                            <div class="stars">@string.Concat(Enumerable.Repeat("★", r.Stars))</div>
+                            <div class="stars">@AbsSilkSaris.Services.CollectionHelper.StarText(r.Stars)</div>
                         </div>
                     </div>
                     <h3 class="h5 serif">@r.Title</h3>

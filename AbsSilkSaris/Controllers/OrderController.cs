@@ -6,7 +6,10 @@ namespace AbsSilkSaris.Controllers;
 public class OrderController : Controller
 {
     private readonly CatalogRepository _db;
-    public OrderController(CatalogRepository db) => _db = db;
+    public OrderController(CatalogRepository db)
+    {
+        _db = db;
+    }
 
     public IActionResult Track()
     {

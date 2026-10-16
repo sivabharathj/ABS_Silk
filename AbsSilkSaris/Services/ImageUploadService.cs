@@ -8,7 +8,10 @@ public class ImageUploadService
         ".jpg", ".jpeg", ".png", ".webp", ".gif"
     };
 
-    public ImageUploadService(IWebHostEnvironment env) => _env = env;
+    public ImageUploadService(IWebHostEnvironment env)
+    {
+        _env = env;
+    }
 
     public async Task<string?> SaveAsync(IFormFile? file, string folder)
     {

@@ -14,9 +14,15 @@ public class CategoriesController : Controller
     private readonly ImageUploadService _images;
     public CategoriesController(CatalogRepository db, ImageUploadService images) { _db = db; _images = images; }
 
-    public async Task<IActionResult> Index() => View(await _db.GetCategoriesAsync());
+    public async Task<IActionResult> Index()
+    {
+        return View(await _db.GetCategoriesAsync());
+    }
 
-    public IActionResult Create() => View(new Category());
+    public IActionResult Create()
+    {
+        return View(new Category());
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Category model, IFormFile? image)
