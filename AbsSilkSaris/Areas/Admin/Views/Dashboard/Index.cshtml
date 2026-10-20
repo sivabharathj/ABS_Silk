@@ -13,7 +13,7 @@
 <table class="table">
     <thead><tr><th>Number</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
     <tbody>
-    @foreach (var o in orders.Take(12))
+    @foreach (var o in orders)
     {
         <tr><td>@o.OrderNumber</td><td>@o.CustomerName</td><td>₹@o.Total.ToString("N0")</td><td>@o.Status</td></tr>
     }

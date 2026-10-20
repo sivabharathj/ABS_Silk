@@ -9,7 +9,10 @@ namespace AbsSilkSaris.Areas.Admin.Controllers;
 public class DashboardController : Controller
 {
     private readonly CatalogRepository _db;
-    public DashboardController(CatalogRepository db) => _db = db;
+    public DashboardController(CatalogRepository db)
+    {
+        _db = db;
+    }
 
     public async Task<IActionResult> Index()
     {
@@ -19,7 +22,7 @@ public class DashboardController : Controller
         ViewBag.SubCategories = subCategories;
         ViewBag.Products = products;
         ViewBag.OrderCount = orders;
-        ViewBag.Orders = await _db.ListOrdersAsync();
+        ViewBag.Orders = AbsSilkSaris.Services.CollectionHelper.TakeFirst(await _db.ListOrdersAsync(), 12);
         return View();
     }
 }

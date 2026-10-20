@@ -16,7 +16,7 @@ public class CheckoutController : Controller
     {
         var lines = _cart.GetCart();
         if (lines.Count == 0) return RedirectToAction("Index", "Cart");
-        var sub = lines.Sum(l => l.Price * l.Quantity);
+        var sub = CollectionHelper.CartSubtotal(lines);
         var ship = sub >= 15000 ? 0 : 350;
         ViewData["Title"] = "Secure Checkout";
         return View(new CheckoutViewModel { Lines = lines, Subtotal = sub, Shipping = ship, Total = sub + ship });
@@ -32,7 +32,7 @@ public class CheckoutController : Controller
             TempData["Notice"] = "Please share your name and email so we can confirm the order.";
             return RedirectToAction(nameof(Index));
         }
-        var sub = lines.Sum(l => l.Price * l.Quantity);
+        var sub = CollectionHelper.CartSubtotal(lines);
         var ship = sub >= 15000 ? 0 : 350;
         var order = new Order
         {
@@ -48,7 +48,7 @@ public class CheckoutController : Controller
             Subtotal = sub,
             Shipping = ship,
             Total = sub + ship,
-            Items = lines.Select(l => new OrderItem { ProductId = l.ProductId, ProductName = l.Name, Quantity = l.Quantity, UnitPrice = l.Price }).ToList()
+            Items = CollectionHelper.ToOrderItems(lines)
         };
         await _db.InsertOrderAsync(order);
         _cart.ClearCart();

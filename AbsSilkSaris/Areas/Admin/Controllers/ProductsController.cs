@@ -14,7 +14,10 @@ public class ProductsController : Controller
     private readonly ImageUploadService _images;
     public ProductsController(CatalogRepository db, ImageUploadService images) { _db = db; _images = images; }
 
-    public async Task<IActionResult> Index() => View(await _db.ListAllProductsAsync());
+    public async Task<IActionResult> Index()
+    {
+        return View(await _db.ListAllProductsAsync());
+    }
 
     public async Task<IActionResult> Create()
     {
@@ -42,8 +45,13 @@ public class ProductsController : Controller
         if (gallery is not null)
         {
             var i = 1;
-            foreach (var file in gallery.Where(f => f.Length > 0))
+            for (int n = 0; n < gallery.Count; n++)
             {
+                var file = gallery[n];
+                if (file.Length <= 0)
+                {
+                    continue;
+                }
                 var g = await _images.SaveAsync(file, "products");
                 if (g is not null) await _db.AddProductImageAsync(id, g, i++, false);
             }
@@ -72,8 +80,13 @@ public class ProductsController : Controller
         if (url is not null) await _db.AddProductImageAsync(model.Id, url, 0, true);
         if (gallery is not null)
         {
-            foreach (var file in gallery.Where(f => f.Length > 0))
+            for (int n = 0; n < gallery.Count; n++)
             {
+                var file = gallery[n];
+                if (file.Length <= 0)
+                {
+                    continue;
+                }
                 var g = await _images.SaveAsync(file, "products");
                 if (g is not null) await _db.AddProductImageAsync(model.Id, g, 10, false);
             }

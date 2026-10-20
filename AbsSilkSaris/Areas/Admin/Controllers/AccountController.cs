@@ -12,7 +12,10 @@ namespace AbsSilkSaris.Areas.Admin.Controllers;
 public class AccountController : Controller
 {
     private readonly CatalogRepository _db;
-    public AccountController(CatalogRepository db) => _db = db;
+    public AccountController(CatalogRepository db)
+    {
+        _db = db;
+    }
 
     [AllowAnonymous]
     public IActionResult Login(string? returnUrl = null)

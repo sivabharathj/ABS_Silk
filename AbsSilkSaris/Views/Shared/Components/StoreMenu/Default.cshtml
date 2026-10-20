@@ -8,7 +8,7 @@
                 var cat = item.Category;
                 <li class="has-mega">
                     <a asp-area="" asp-controller="Shop" asp-action="Index" asp-route-category="@cat.Slug">@cat.Name <i class="bi bi-chevron-down"></i></a>
-                    @if (item.SubCategories.Any())
+                    @if (item.SubCategories.Count > 0)
                     {
                         <div class="mega-panel">
                             <div class="container-xl mega-grid mega-grid-cats">

@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace AbsSilkSaris.Models;
 
 public class Order
@@ -15,11 +13,8 @@ public class Order
     public string Pincode { get; set; } = string.Empty;
     public string Status { get; set; } = "Confirmed";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    [Column(TypeName = "decimal(18,2)")]
     public decimal Subtotal { get; set; }
-    [Column(TypeName = "decimal(18,2)")]
     public decimal Shipping { get; set; }
-    [Column(TypeName = "decimal(18,2)")]
     public decimal Total { get; set; }
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 }
@@ -32,6 +27,5 @@ public class OrderItem
     public int ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;
     public int Quantity { get; set; }
-    [Column(TypeName = "decimal(18,2)")]
     public decimal UnitPrice { get; set; }
 }

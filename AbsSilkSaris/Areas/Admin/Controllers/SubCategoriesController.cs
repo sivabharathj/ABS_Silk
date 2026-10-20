@@ -71,6 +71,8 @@ public class SubCategoriesController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> ByCategory(int categoryId) =>
-        Json(await _db.GetSubCategoriesAsync(categoryId));
+    public async Task<IActionResult> ByCategory(int categoryId)
+    {
+        return Json(await _db.GetSubCategoriesAsync(categoryId));
+    }
 }

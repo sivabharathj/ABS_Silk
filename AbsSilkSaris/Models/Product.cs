@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace AbsSilkSaris.Models;
 
 public class Product
@@ -12,9 +10,7 @@ public class Product
     public string Color { get; set; } = string.Empty;
     public string Weave { get; set; } = string.Empty;
     public string Occasion { get; set; } = string.Empty;
-    [Column(TypeName = "decimal(18,2)")]
     public decimal Price { get; set; }
-    [Column(TypeName = "decimal(18,2)")]
     public decimal? CompareAtPrice { get; set; }
     public string ImageUrl { get; set; } = string.Empty;
     public string? HoverImageUrl { get; set; }
@@ -30,8 +26,15 @@ public class Product
     public double Rating { get; set; } = 4.8;
     public int ReviewCount { get; set; } = 12;
 
-    public int DiscountPercent =>
-        CompareAtPrice is > 0 && CompareAtPrice > Price
-            ? (int)Math.Round((1 - Price / CompareAtPrice.Value) * 100)
-            : 0;
+    public int DiscountPercent
+    {
+        get
+        {
+            if (CompareAtPrice is > 0 && CompareAtPrice > Price)
+            {
+                return (int)Math.Round((1 - Price / CompareAtPrice.Value) * 100);
+            }
+            return 0;
+        }
+    }
 }

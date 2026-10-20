@@ -69,7 +69,11 @@ public static class Ado
         where T : class
     {
         var rows = await QueryAsync(conn, sql, map, args);
-        return rows.FirstOrDefault();
+        if (rows.Count == 0)
+        {
+            return null;
+        }
+        return rows[0];
     }
 
     public static string Str(IDataRecord r, string col)

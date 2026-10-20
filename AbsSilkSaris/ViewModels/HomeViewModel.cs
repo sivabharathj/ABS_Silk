@@ -24,6 +24,7 @@ public class ShopViewModel
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
     public int TotalCount { get; set; }
+    public string Heading { get; set; } = "Shop Collection";
 }
 
 public class CheckoutViewModel

@@ -32,10 +32,17 @@ public class CartController : Controller
     public IActionResult Update(int id, int qty)
     {
         var cart = _cart.GetCart();
-        var line = cart.FirstOrDefault(x => x.ProductId == id);
+        var line = CollectionHelper.FindCartLine(cart, id);
         if (line is not null)
         {
-            if (qty <= 0) cart.Remove(line); else line.Quantity = qty;
+            if (qty <= 0)
+            {
+                cart.Remove(line);
+            }
+            else
+            {
+                line.Quantity = qty;
+            }
             _cart.SaveCart(cart);
         }
         return RedirectToAction(nameof(Index));
@@ -44,7 +51,7 @@ public class CartController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public IActionResult Remove(int id)
     {
-        _cart.SaveCart(_cart.GetCart().Where(x => x.ProductId != id).ToList());
+        _cart.SaveCart(CollectionHelper.RemoveCartLine(_cart.GetCart(), id));
         return RedirectToAction(nameof(Index));
     }
 }

@@ -32,14 +32,25 @@
 </div>
 @section Scripts {
 <script>
-  const subs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(subs.Select(s => new { s.Id, s.CategoryId, s.Name })));
-  const cat = document.getElementById('CategoryId');
-  const sub = document.getElementById('SubCategoryId');
+  var subs = @Html.Raw(AbsSilkSaris.Services.CollectionHelper.ToSubCategoryJson(subs));
+  var cat = document.getElementById('CategoryId');
+  var sub = document.getElementById('SubCategoryId');
   function filterSubs() {
-    const cid = parseInt(cat.value || '0', 10);
-    const current = sub.value;
-    sub.innerHTML = '<option value="0">None</option>' + subs.filter(s => s.CategoryId === cid).map(s => `<option value="${s.Id}">${s.Name}</option>`).join('');
-    if ([...sub.options].some(o => o.value === current)) sub.value = current;
+    var cid = parseInt(cat.value || '0', 10);
+    var current = sub.value;
+    var html = '<option value="0">None</option>';
+    for (var i = 0; i < subs.length; i++) {
+      if (subs[i].CategoryId === cid) {
+        html += '<option value="' + subs[i].Id + '">' + subs[i].Name + '</option>';
+      }
+    }
+    sub.innerHTML = html;
+    for (var j = 0; j < sub.options.length; j++) {
+      if (sub.options[j].value === current) {
+        sub.value = current;
+        break;
+      }
+    }
   }
   cat.addEventListener('change', filterSubs);
   filterSubs();

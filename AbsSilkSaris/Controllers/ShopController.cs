@@ -1,4 +1,6 @@
 using AbsSilkSaris.Data;
+using AbsSilkSaris.Models;
+using AbsSilkSaris.Services;
 using AbsSilkSaris.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,40 +9,63 @@ namespace AbsSilkSaris.Controllers;
 public class ShopController : Controller
 {
     private readonly CatalogRepository _db;
-    public ShopController(CatalogRepository db) => _db = db;
+
+    public ShopController(CatalogRepository db)
+    {
+        _db = db;
+    }
 
     public async Task<IActionResult> Index(string? category, string? subcategory, string? color, string? q, string sort = "featured", decimal? min = null, decimal? max = null)
     {
         var products = await _db.SearchProductsAsync(category, subcategory, color, q, sort, min, max);
         var cats = await _db.GetCategoriesAsync(activeOnly: true);
-        var selected = cats.FirstOrDefault(c => c.Slug == category);
-        var model = new ShopViewModel
+        Category? selected = CollectionHelper.FindCategoryBySlug(cats, category);
+        int? selectedId = null;
+        if (selected != null)
         {
-            Products = products,
-            Categories = cats,
-            SubCategories = await _db.GetSubCategoriesAsync(selected?.Id, menuOnly: false),
-            Colors = await _db.GetColorsAsync(),
-            CategorySlug = category,
-            SubCategorySlug = subcategory,
-            Color = color,
-            Query = q,
-            Sort = sort,
-            MinPrice = min,
-            MaxPrice = max,
-            TotalCount = products.Count
-        };
-        ViewData["Title"] = selected?.Name ?? (string.IsNullOrWhiteSpace(subcategory) ? "Shop Collection" : products.FirstOrDefault()?.SubCategory?.Name ?? "Collection");
+            selectedId = selected.Id;
+        }
+        var model = new ShopViewModel();
+        model.Products = products;
+        model.Categories = cats;
+        model.SubCategories = await _db.GetSubCategoriesAsync(selectedId, menuOnly: false);
+        model.Colors = await _db.GetColorsAsync();
+        model.CategorySlug = category;
+        model.SubCategorySlug = subcategory;
+        model.Color = color;
+        model.Query = q;
+        model.Sort = sort;
+        model.MinPrice = min;
+        model.MaxPrice = max;
+        model.TotalCount = products.Count;
+        if (selected != null)
+        {
+            model.Heading = selected.Name;
+            ViewData["Title"] = selected.Name;
+        }
+        else
+        {
+            model.Heading = "Shop Collection";
+            ViewData["Title"] = "Shop Collection";
+        }
         return View(model);
     }
 
     public async Task<IActionResult> Details(string slug)
     {
         var product = await _db.GetProductBySlugAsync(slug);
-        if (product is null) return NotFound();
+        if (product is null)
+        {
+            return NotFound();
+        }
         product.Images = await _db.GetProductImagesAsync(product.Id);
-        var related = (await _db.SearchProductsAsync(product.Category?.Slug, null, null, null, "featured", null, null))
-            .Where(p => p.Id != product.Id).Take(4).ToList();
-        ViewBag.Related = related;
+        string? catSlug = null;
+        if (product.Category != null)
+        {
+            catSlug = product.Category.Slug;
+        }
+        var relatedSource = await _db.SearchProductsAsync(catSlug, null, null, null, "featured", null, null);
+        ViewBag.Related = CollectionHelper.RelatedProducts(relatedSource, product.Id, 4);
         ViewData["Title"] = product.Name;
         return View(product);
     }
@@ -48,7 +73,10 @@ public class ShopController : Controller
     public async Task<IActionResult> QuickView(int id)
     {
         var product = await _db.GetProductByIdAsync(id);
-        if (product is null) return NotFound();
+        if (product is null)
+        {
+            return NotFound();
+        }
         return PartialView("_QuickView", product);
     }
 }

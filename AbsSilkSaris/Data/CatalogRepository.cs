@@ -6,35 +6,135 @@ namespace AbsSilkSaris.Data;
 public class CatalogRepository
 {
     private readonly IDbConnectionFactory _factory;
-    public CatalogRepository(IDbConnectionFactory factory) => _factory = factory;
-
-    private Task<IDbConnection> Open() => Ado.OpenAsync(_factory);
-
-    private static Category MapCategory(IDataRecord r) => new()
+    public CatalogRepository(IDbConnectionFactory factory)
     {
-        Id = Ado.Int(r, "Id"),
-        Name = Ado.Str(r, "Name"),
-        Slug = Ado.Str(r, "Slug"),
-        Description = Ado.Str(r, "Description"),
-        ImageUrl = Ado.Str(r, "ImageUrl"),
-        SortOrder = Ado.Int(r, "SortOrder"),
-        IsActive = Ado.Flag(r, "IsActive"),
-        ShowInMenu = Ado.Flag(r, "ShowInMenu")
-    };
+        _factory = factory;
+    }
 
-    private static SubCategory MapSub(IDataRecord r) => new()
+    private Task<IDbConnection> Open()
     {
-        Id = Ado.Int(r, "Id"),
-        CategoryId = Ado.Int(r, "CategoryId"),
-        CategoryName = r.FieldCount > 8 && Has(r, "CategoryName") ? Ado.Str(r, "CategoryName") : "",
-        Name = Ado.Str(r, "Name"),
-        Slug = Ado.Str(r, "Slug"),
-        Description = Ado.Str(r, "Description"),
-        ImageUrl = Ado.Str(r, "ImageUrl"),
-        SortOrder = Ado.Int(r, "SortOrder"),
-        IsActive = Ado.Flag(r, "IsActive"),
-        ShowInMenu = Ado.Flag(r, "ShowInMenu")
-    };
+        return Ado.OpenAsync(_factory);
+    }
+
+    private static Category MapCategory(IDataRecord r)
+    {
+        Category item = new Category();
+        item.Id = Ado.Int(r, "Id");
+        item.Name = Ado.Str(r, "Name");
+        item.Slug = Ado.Str(r, "Slug");
+        item.Description = Ado.Str(r, "Description");
+        item.ImageUrl = Ado.Str(r, "ImageUrl");
+        item.SortOrder = Ado.Int(r, "SortOrder");
+        item.IsActive = Ado.Flag(r, "IsActive");
+        item.ShowInMenu = Ado.Flag(r, "ShowInMenu");
+        return item;
+    }
+
+    private static SubCategory MapSub(IDataRecord r)
+    {
+        SubCategory item = new SubCategory();
+        item.Id = Ado.Int(r, "Id");
+        item.CategoryId = Ado.Int(r, "CategoryId");
+        if (r.FieldCount > 8 && Has(r, "CategoryName"))
+        {
+            item.CategoryName = Ado.Str(r, "CategoryName");
+        }
+        item.Name = Ado.Str(r, "Name");
+        item.Slug = Ado.Str(r, "Slug");
+        item.Description = Ado.Str(r, "Description");
+        item.ImageUrl = Ado.Str(r, "ImageUrl");
+        item.SortOrder = Ado.Int(r, "SortOrder");
+        item.IsActive = Ado.Flag(r, "IsActive");
+        item.ShowInMenu = Ado.Flag(r, "ShowInMenu");
+        return item;
+    }
+
+    private static AdminUser MapAdmin(IDataRecord r)
+    {
+        AdminUser item = new AdminUser();
+        item.Id = Ado.Int(r, "Id");
+        item.Username = Ado.Str(r, "Username");
+        item.PasswordHash = Ado.Str(r, "PasswordHash");
+        item.FullName = Ado.Str(r, "FullName");
+        item.Role = Ado.Str(r, "Role");
+        return item;
+    }
+
+    private static string MapColor(IDataRecord r)
+    {
+        return Ado.Str(r, "Color");
+    }
+
+    private static ProductImage MapProductImage(IDataRecord r)
+    {
+        ProductImage item = new ProductImage();
+        item.Id = Ado.Int(r, "Id");
+        item.ProductId = Ado.Int(r, "ProductId");
+        item.ImageUrl = Ado.Str(r, "ImageUrl");
+        item.SortOrder = Ado.Int(r, "SortOrder");
+        item.IsPrimary = Ado.Flag(r, "IsPrimary");
+        return item;
+    }
+
+    private static Review MapReview(IDataRecord r)
+    {
+        Review item = new Review();
+        item.Id = Ado.Int(r, "Id");
+        item.CustomerName = Ado.Str(r, "CustomerName");
+        item.Location = Ado.Str(r, "Location");
+        item.PhotoUrl = Ado.Str(r, "PhotoUrl");
+        item.Stars = Ado.Int(r, "Stars");
+        item.Title = Ado.Str(r, "Title");
+        item.Body = Ado.Str(r, "Body");
+        item.ProductId = Ado.IntN(r, "ProductId");
+        return item;
+    }
+
+    private static SettingRow MapSetting(IDataRecord r)
+    {
+        SettingRow item = new SettingRow();
+        item.Key = Ado.Str(r, "Key");
+        item.Value = Ado.Str(r, "Value");
+        return item;
+    }
+
+    private static Order MapOrder(IDataRecord r)
+    {
+        Order item = new Order();
+        item.Id = Ado.Int(r, "Id");
+        item.OrderNumber = Ado.Str(r, "OrderNumber");
+        item.CustomerName = Ado.Str(r, "CustomerName");
+        item.Email = Ado.Str(r, "Email");
+        item.Phone = Has(r, "Phone") ? Ado.Str(r, "Phone") : "";
+        item.Address = Has(r, "Address") ? Ado.Str(r, "Address") : "";
+        item.City = Has(r, "City") ? Ado.Str(r, "City") : "";
+        item.State = Has(r, "State") ? Ado.Str(r, "State") : "";
+        item.Pincode = Has(r, "Pincode") ? Ado.Str(r, "Pincode") : "";
+        item.Status = Ado.Str(r, "Status");
+        item.CreatedAt = Ado.Dt(r, "CreatedAt");
+        item.Subtotal = Has(r, "Subtotal") ? Ado.Dec(r, "Subtotal") : 0;
+        item.Shipping = Has(r, "Shipping") ? Ado.Dec(r, "Shipping") : 0;
+        item.Total = Ado.Dec(r, "Total");
+        return item;
+    }
+
+    private static OrderItem MapOrderItem(IDataRecord r)
+    {
+        OrderItem item = new OrderItem();
+        item.Id = Ado.Int(r, "Id");
+        item.OrderId = Ado.Int(r, "OrderId");
+        item.ProductId = Ado.Int(r, "ProductId");
+        item.ProductName = Ado.Str(r, "ProductName");
+        item.Quantity = Ado.Int(r, "Quantity");
+        item.UnitPrice = Ado.Dec(r, "UnitPrice");
+        return item;
+    }
+
+    private class SettingRow
+    {
+        public string Key { get; set; } = string.Empty;
+        public string Value { get; set; } = string.Empty;
+    }
 
     private static bool Has(IDataRecord r, string name)
     {
@@ -99,14 +199,7 @@ public class CatalogRepository
         await using var conn = (System.Data.Common.DbConnection)await Open();
         return await Ado.QuerySingleAsync(conn,
             "SELECT Id, Username, PasswordHash, FullName, Role FROM Admins WHERE Username=@u",
-            r => new AdminUser
-            {
-                Id = Ado.Int(r, "Id"),
-                Username = Ado.Str(r, "Username"),
-                PasswordHash = Ado.Str(r, "PasswordHash"),
-                FullName = Ado.Str(r, "FullName"),
-                Role = Ado.Str(r, "Role")
-            }, ("u", username));
+            MapAdmin, ("u", username));
     }
 
     public async Task<int> CategoryCountAsync()
@@ -214,14 +307,25 @@ public class CatalogRepository
     {
         var cats = await GetCategoriesAsync(menuOnly: true, activeOnly: true);
         var subs = await GetSubCategoriesAsync(menuOnly: true);
-        return cats.Select(c => new MenuCategory
+        var menu = new List<MenuCategory>();
+        for (int i = 0; i < cats.Count; i++)
         {
-            Category = c,
-            SubCategories = subs.Where(s => s.CategoryId == c.Id).ToList()
-        }).ToList();
+            MenuCategory item = new MenuCategory();
+            item.Category = cats[i];
+            item.SubCategories = new List<SubCategory>();
+            for (int j = 0; j < subs.Count; j++)
+            {
+                if (subs[j].CategoryId == cats[i].Id)
+                {
+                    item.SubCategories.Add(subs[j]);
+                }
+            }
+            menu.Add(item);
+        }
+        return menu;
     }
 
-    public async Task<List<Product>> SearchProductsAsync(string? categorySlug, string? subSlug, string? color, string? q, string sort, decimal? min, decimal? max, bool? isNew = null, bool? best = null)
+    public async Task<List<Product>> SearchProductsAsync(string? categorySlug, string? subSlug, string? color, string? q, string sort, decimal? min, decimal? max, bool? isNew = null, bool? best = null, int maxRows = 0)
     {
         await using var conn = (System.Data.Common.DbConnection)await Open();
         var sql = """
@@ -240,13 +344,33 @@ public class CatalogRepository
         if (max is not null) { sql += " AND p.Price<=@max"; args.Add(("max", max)); }
         if (isNew == true) sql += " AND p.IsNew=1";
         if (best == true) sql += " AND p.IsBestSeller=1";
-        sql += sort switch
+        if (sort == "price-asc")
         {
-            "price-asc" => " ORDER BY p.Price ASC",
-            "price-desc" => " ORDER BY p.Price DESC",
-            "newest" => " ORDER BY p.Id DESC",
-            _ => " ORDER BY p.IsBestSeller DESC, p.IsNew DESC, p.Id DESC"
-        };
+            sql += " ORDER BY p.Price ASC";
+        }
+        else if (sort == "price-desc")
+        {
+            sql += " ORDER BY p.Price DESC";
+        }
+        else if (sort == "newest")
+        {
+            sql += " ORDER BY p.Id DESC";
+        }
+        else
+        {
+            sql += " ORDER BY p.IsBestSeller DESC, p.IsNew DESC, p.Id DESC";
+        }
+        if (maxRows > 0)
+        {
+            if (_factory.IsSqlServer)
+            {
+                sql += " OFFSET 0 ROWS FETCH NEXT " + maxRows + " ROWS ONLY";
+            }
+            else
+            {
+                sql += " LIMIT " + maxRows;
+            }
+        }
         return await Ado.QueryAsync(conn, sql, MapProduct, args.ToArray());
     }
 
@@ -285,7 +409,7 @@ public class CatalogRepository
     public async Task<List<string>> GetColorsAsync()
     {
         await using var conn = (System.Data.Common.DbConnection)await Open();
-        return await Ado.QueryAsync(conn, "SELECT DISTINCT Color FROM Products WHERE Color<>'' ORDER BY Color", r => Ado.Str(r, "Color"));
+        return await Ado.QueryAsync(conn, "SELECT DISTINCT Color FROM Products WHERE Color<>'' ORDER BY Color", MapColor);
     }
 
     public async Task<int> InsertProductAsync(Product p)
@@ -328,14 +452,7 @@ public class CatalogRepository
         await using var conn = (System.Data.Common.DbConnection)await Open();
         return await Ado.QueryAsync(conn,
             "SELECT Id, ProductId, ImageUrl, SortOrder, IsPrimary FROM ProductImages WHERE ProductId=@id ORDER BY IsPrimary DESC, SortOrder, Id",
-            r => new ProductImage
-            {
-                Id = Ado.Int(r, "Id"),
-                ProductId = Ado.Int(r, "ProductId"),
-                ImageUrl = Ado.Str(r, "ImageUrl"),
-                SortOrder = Ado.Int(r, "SortOrder"),
-                IsPrimary = Ado.Flag(r, "IsPrimary")
-            }, ("id", productId));
+            MapProductImage, ("id", productId));
     }
 
     public async Task AddProductImageAsync(int productId, string url, int sort, bool primary)
@@ -361,17 +478,7 @@ public class CatalogRepository
     {
         await using var conn = (System.Data.Common.DbConnection)await Open();
         return await Ado.QueryAsync(conn, "SELECT Id, CustomerName, Location, PhotoUrl, Stars, Title, Body, ProductId FROM Reviews ORDER BY Id DESC",
-            r => new Review
-            {
-                Id = Ado.Int(r, "Id"),
-                CustomerName = Ado.Str(r, "CustomerName"),
-                Location = Ado.Str(r, "Location"),
-                PhotoUrl = Ado.Str(r, "PhotoUrl"),
-                Stars = Ado.Int(r, "Stars"),
-                Title = Ado.Str(r, "Title"),
-                Body = Ado.Str(r, "Body"),
-                ProductId = Ado.IntN(r, "ProductId")
-            });
+            MapReview);
     }
 
     public async Task InsertReviewAsync(Review r)
@@ -391,8 +498,13 @@ public class CatalogRepository
     public async Task<Dictionary<string, string>> GetSettingsAsync()
     {
         await using var conn = (System.Data.Common.DbConnection)await Open();
-        var rows = await Ado.QueryAsync(conn, "SELECT Key, Value FROM SiteSettings", r => (Ado.Str(r, "Key"), Ado.Str(r, "Value")));
-        return rows.ToDictionary(x => x.Item1, x => x.Item2, StringComparer.OrdinalIgnoreCase);
+        var rows = await Ado.QueryAsync(conn, "SELECT Key, Value FROM SiteSettings", MapSetting);
+        Dictionary<string, string> map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        for (int i = 0; i < rows.Count; i++)
+        {
+            map[rows[i].Key] = rows[i].Value;
+        }
+        return map;
     }
 
     public async Task UpsertSettingAsync(string key, string value)
@@ -450,49 +562,16 @@ public class CatalogRepository
         var sql = "SELECT * FROM Orders WHERE OrderNumber=@n";
         var args = new List<(string, object?)> { ("n", number) };
         if (!string.IsNullOrWhiteSpace(email)) { sql += " AND Email=@e"; args.Add(("e", email)); }
-        var order = await Ado.QuerySingleAsync(conn, sql, r => new Order
-        {
-            Id = Ado.Int(r, "Id"),
-            OrderNumber = Ado.Str(r, "OrderNumber"),
-            CustomerName = Ado.Str(r, "CustomerName"),
-            Email = Ado.Str(r, "Email"),
-            Phone = Ado.Str(r, "Phone"),
-            Address = Ado.Str(r, "Address"),
-            City = Ado.Str(r, "City"),
-            State = Ado.Str(r, "State"),
-            Pincode = Ado.Str(r, "Pincode"),
-            Status = Ado.Str(r, "Status"),
-            CreatedAt = Ado.Dt(r, "CreatedAt"),
-            Subtotal = Ado.Dec(r, "Subtotal"),
-            Shipping = Ado.Dec(r, "Shipping"),
-            Total = Ado.Dec(r, "Total")
-        }, args.ToArray());
+        var order = await Ado.QuerySingleAsync(conn, sql, MapOrder, args.ToArray());
         if (order is null) return null;
-        order.Items = await Ado.QueryAsync(conn, "SELECT * FROM OrderItems WHERE OrderId=@id", r => new OrderItem
-        {
-            Id = Ado.Int(r, "Id"),
-            OrderId = Ado.Int(r, "OrderId"),
-            ProductId = Ado.Int(r, "ProductId"),
-            ProductName = Ado.Str(r, "ProductName"),
-            Quantity = Ado.Int(r, "Quantity"),
-            UnitPrice = Ado.Dec(r, "UnitPrice")
-        }, ("id", order.Id));
+        order.Items = await Ado.QueryAsync(conn, "SELECT * FROM OrderItems WHERE OrderId=@id", MapOrderItem, ("id", order.Id));
         return order;
     }
 
     public async Task<List<Order>> ListOrdersAsync()
     {
         await using var conn = (System.Data.Common.DbConnection)await Open();
-        return await Ado.QueryAsync(conn, "SELECT * FROM Orders ORDER BY Id DESC", r => new Order
-        {
-            Id = Ado.Int(r, "Id"),
-            OrderNumber = Ado.Str(r, "OrderNumber"),
-            CustomerName = Ado.Str(r, "CustomerName"),
-            Email = Ado.Str(r, "Email"),
-            Status = Ado.Str(r, "Status"),
-            Total = Ado.Dec(r, "Total"),
-            CreatedAt = Ado.Dt(r, "CreatedAt")
-        });
+        return await Ado.QueryAsync(conn, "SELECT * FROM Orders ORDER BY Id DESC", MapOrder);
     }
 
     public async Task<(int Categories, int SubCategories, int Products, int Orders)> DashboardCountsAsync()
